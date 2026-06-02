@@ -237,11 +237,49 @@ body {
     justify-content: center;
     border: 3px solid var(--border);
     box-shadow: var(--shadow-lg);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all var(--transition);
+}
+
+.avatar-placeholder:hover {
+    border-color: var(--primary);
+    transform: scale(1.05);
 }
 
 .avatar-placeholder svg {
     width: 100px;
     height: 100px;
+}
+
+.avatar-placeholder img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.avatar-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    text-align: center;
+    padding: 8px;
+    font-size: 0.8rem;
+    opacity: 0;
+    transition: opacity var(--transition);
+    border-radius: 0 0 50% 50%;
+}
+
+.avatar-placeholder:hover .avatar-overlay {
+    opacity: 1;
 }
 
 .scroll-indicator {

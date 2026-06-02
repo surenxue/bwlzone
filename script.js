@@ -124,4 +124,29 @@ if (titleEl) {
     setTimeout(typeWriter, 500);
 }
 
+// ========== 头像点击切换 ==========
+const avatarContainer = document.getElementById('avatarContainer');
+const avatarInput = document.getElementById('avatarInput');
+const avatarImg = document.getElementById('avatarImg');
+const avatarSvg = document.getElementById('avatarSvg');
+
+// 点击头像触发文件选择
+avatarContainer.addEventListener('click', () => {
+    avatarInput.click();
+});
+
+// 选择图片后切换显示
+avatarInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+        avatarImg.src = event.target.result;
+        avatarImg.style.display = 'block';
+        avatarSvg.style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+});
+
 console.log('✨ 欢迎来到我的个人主页！');
