@@ -1,98 +1,102 @@
-// ========== 滚动淡入动画 ==========
-const observerOptions = {
-    threshold: 0.15,
-    rootMargin: '0px 0px -50px 0px'
-};
+// ========== 头像点击切换 ==========
+(function() {
+    var avatarContainer = document.getElementById('avatarContainer');
+    var avatarInput = document.getElementById('avatarInput');
+    var avatarImg = document.getElementById('avatarImg');
+    var avatarSvg = document.getElementById('avatarSvg');
 
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
+    if (avatarContainer && avatarInput) {
+        avatarContainer.addEventListener('click', function() {
+            avatarInput.click();
+        });
+
+        avatarInput.addEventListener('change', function(e) {
+            var file = e.target.files[0];
+            if (!file) return;
+
+            var reader = new FileReader();
+            reader.onload = function(event) {
+                avatarImg.src = event.target.result;
+                avatarImg.style.display = 'block';
+                if (avatarSvg) avatarSvg.style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+})();
+
+// ========== 滚动淡入动画 ==========
+var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
         if (entry.isIntersecting) {
             entry.target.classList.add('visible');
         }
     });
-}, observerOptions);
+}, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
 
-// 为所有卡片和内容区域添加淡入效果
-document.querySelectorAll('.skill-card, .project-card, .about-content, .contact-links, .stat-item').forEach(el => {
+var fadeElements = document.querySelectorAll(
+    '.about-card, .project-card, .contact-item, .stat-item, .section-header'
+);
+fadeElements.forEach(function(el) {
     el.classList.add('fade-in');
     observer.observe(el);
 });
 
 // ========== 导航栏滚动效果 ==========
-const navbar = document.querySelector('.navbar');
-let lastScroll = 0;
-
-window.addEventListener('scroll', () => {
-    const currentScroll = window.pageYOffset;
-
-    // 滚动超过 100px 添加阴影
-    if (currentScroll > 100) {
-        navbar.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.3)';
-    } else {
-        navbar.style.boxShadow = 'none';
+var navbar = document.querySelector('.navbar');
+window.addEventListener('scroll', function() {
+    if (navbar) {
+        if (window.pageYOffset > 80) {
+            navbar.classList.add('scrolled');
+        } else {
+            navbar.classList.remove('scrolled');
+        }
     }
-
-    lastScroll = currentScroll;
 });
 
-// ========== 平滑滚动导航（针对 Safari） ==========
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+// ========== 平滑滚动 ==========
+document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
     anchor.addEventListener('click', function(e) {
         e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
+        var target = document.querySelector(this.getAttribute('href'));
         if (target) {
-            const offset = 80;
-            const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - offset;
-            window.scrollTo({
-                top: targetPosition,
-                behavior: 'smooth'
-            });
+            var offset = 80;
+            var top = target.getBoundingClientRect().top + window.pageYOffset - offset;
+            window.scrollTo({ top: top, behavior: 'smooth' });
         }
-    });
-});
-
-// ========== 技能卡片悬浮粒子效果 ==========
-document.querySelectorAll('.skill-card').forEach(card => {
-    card.addEventListener('mousemove', (e) => {
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-
-        card.style.setProperty('--mouse-x', `${x}px`);
-        card.style.setProperty('--mouse-y', `${y}px`);
     });
 });
 
 // ========== 数字递增动画 ==========
 function animateNumbers() {
-    document.querySelectorAll('.stat-number').forEach(stat => {
-        const text = stat.textContent;
-        const match = text.match(/(\d+)(\+?)/);
+    var statNumbers = document.querySelectorAll('.stat-number');
+    statNumbers.forEach(function(stat) {
+        var text = stat.textContent;
+        var match = text.match(/(\d+)(\+?)/);
         if (!match) return;
 
-        const target = parseInt(match[1]);
-        const suffix = match[2] || '';
-        const duration = 1500;
-        const startTime = performance.now();
+        var target = parseInt(match[1]);
+        var suffix = match[2] || '';
+        var duration = 1500;
+        var startTime = null;
+        var animated = false;
 
-        function update(currentTime) {
-            const elapsed = currentTime - startTime;
-            const progress = Math.min(elapsed / duration, 1);
-
-            // easeOutExpo
-            const eased = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
-            const current = Math.floor(eased * target);
-
+        function update(timestamp) {
+            if (!startTime) startTime = timestamp;
+            var elapsed = timestamp - startTime;
+            var progress = Math.min(elapsed / duration, 1);
+            var eased = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+            var current = Math.floor(eased * target);
             stat.textContent = current + suffix;
-
             if (progress < 1) {
                 requestAnimationFrame(update);
             }
         }
 
-        const numObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
+        var numObserver = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                if (entry.isIntersecting && !animated) {
+                    animated = true;
                     requestAnimationFrame(update);
                     numObserver.unobserve(entry.target);
                 }
@@ -102,51 +106,24 @@ function animateNumbers() {
         numObserver.observe(stat);
     });
 }
-
 animateNumbers();
 
 // ========== 打字机效果 ==========
-const titleEl = document.querySelector('.title');
-if (titleEl) {
-    const originalText = titleEl.textContent;
-    titleEl.textContent = '';
-    let charIndex = 0;
-
-    function typeWriter() {
-        if (charIndex < originalText.length) {
-            titleEl.textContent += originalText.charAt(charIndex);
-            charIndex++;
-            setTimeout(typeWriter, 60);
+(function() {
+    var titleEl = document.querySelector('.gradient-text');
+    if (titleEl) {
+        var originalText = titleEl.textContent;
+        titleEl.textContent = '';
+        var charIndex = 0;
+        function typeWriter() {
+            if (charIndex < originalText.length) {
+                titleEl.textContent += originalText.charAt(charIndex);
+                charIndex++;
+                setTimeout(typeWriter, 60);
+            }
         }
+        setTimeout(typeWriter, 500);
     }
+})();
 
-    // 延迟 500ms 后开始打字
-    setTimeout(typeWriter, 500);
-}
-
-// ========== 头像点击切换 ==========
-const avatarContainer = document.getElementById('avatarContainer');
-const avatarInput = document.getElementById('avatarInput');
-const avatarImg = document.getElementById('avatarImg');
-const avatarSvg = document.getElementById('avatarSvg');
-
-// 点击头像触发文件选择
-avatarContainer.addEventListener('click', () => {
-    avatarInput.click();
-});
-
-// 选择图片后切换显示
-avatarInput.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-        avatarImg.src = event.target.result;
-        avatarImg.style.display = 'block';
-        avatarSvg.style.display = 'none';
-    };
-    reader.readAsDataURL(file);
-});
-
-console.log('✨ 欢迎来到我的个人主页！');
+console.log('✨ BWL Zone 已就绪！');
