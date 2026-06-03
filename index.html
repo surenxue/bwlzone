@@ -275,9 +275,9 @@
         </div>
 
         <!-- 页脚 -->
-        <footer class="site-footer" v-if="!isloading">
+        <footer class="site-footer" v-if="!isloading && (configdata.statement?.icp || configdata.statement?.copyright)">
             <p v-if="configdata.statement?.icp">{{ configdata.statement.icp }}</p>
-            <p>{{ configdata.statement?.copyright || 'Copyright © 2025 BWL' }}</p>
+            <p v-if="configdata.statement?.copyright">{{ configdata.statement.copyright }}</p>
         </footer>
     </div>
 
@@ -288,7 +288,7 @@ const config = {
         title: "BWL的角落",
         description: "欢迎来到BWL的角落！",
         keywords: "BWL,bwl,BWL的角落,个人主页,个人网站",
-        icon: "/favicon.ico"
+        icon: "img/avatar.jpg"
     },
     avatar: "img/avatar.jpg",
     welcometitle: "Hi, 欢迎来到BWL的角落",
@@ -370,7 +370,7 @@ const config = {
     ],
     statement: {
         icp: "",
-        copyright: "Copyright © 2025 BWL"
+        copyright: ""
     }
 };
 

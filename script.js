@@ -100,6 +100,16 @@ const app = createApp({
         },
 
         // ========== 头像 ==========
+        updateFavicon(src) {
+            let link = document.querySelector("link[rel='icon']");
+            if (!link) {
+                link = document.createElement('link');
+                link.rel = 'icon';
+                link.type = 'image/x-icon';
+                document.head.appendChild(link);
+            }
+            link.href = src;
+        },
         onAvatarChange(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -107,6 +117,7 @@ const app = createApp({
             reader.onload = (event) => {
                 this.avatarSrc = event.target.result;
                 localStorage.setItem('bwl_avatar', event.target.result);
+                this.updateFavicon(event.target.result);
             };
             reader.readAsDataURL(file);
         },
@@ -310,7 +321,10 @@ const app = createApp({
         async init() {
             // 恢复头像
             const savedAvatar = localStorage.getItem('bwl_avatar');
-            if (savedAvatar) this.avatarSrc = savedAvatar;
+            if (savedAvatar) {
+                this.avatarSrc = savedAvatar;
+                this.updateFavicon(savedAvatar);
+            }
 
             // 设置背景
             this.setMainProperty();
