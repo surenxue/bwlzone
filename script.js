@@ -74,6 +74,11 @@ const app = createApp({
                 { icon: 'mdi mdi-vuetify', color: '#1697F6', tip: 'vuetify' },
             ],
 
+            // QQ音乐嵌入
+            musicMode: 'meting', // 'meting' | 'qqmusic'
+            qqMusicPlaylistId: '',
+            qqMusicIframeHeight: 600,
+
             // 打字机
             typewriterIndex: 0,
             typewriterCharIndex: 0,
@@ -86,6 +91,12 @@ const app = createApp({
         },
         audioPlayer() {
             return this.$refs.audioPlayer;
+        },
+        showMusicBtn() {
+            if (this.musicMode === 'qqmusic') {
+                return !!this.qqMusicPlaylistId;
+            }
+            return this.musicinfo && this.musicinfo.length;
         },
         currentWallpaperList() {
             if (!this.configdata.wallpaper) return [];
@@ -219,6 +230,21 @@ const app = createApp({
                 console.error('音乐请求失败:', err);
                 this.musicinfoLoading = false;
             }
+        },
+        // QQ音乐切换
+        switchMusicMode(mode) {
+            this.musicMode = mode;
+            this.saveQQMusicSettings();
+            if (mode === 'meting' && !this.musicinfo) {
+                this.getMusicInfo();
+            }
+        },
+        saveQQMusicSettings() {
+            localStorage.setItem('bwl_qqmusic', JSON.stringify({
+                musicMode: this.musicMode,
+                qqMusicPlaylistId: this.qqMusicPlaylistId,
+                qqMusicIframeHeight: this.qqMusicIframeHeight
+            }));
         },
         togglePlay() {
             if (!this.audioPlayer) return;
@@ -789,11 +815,21 @@ const app = createApp({
             if (savedSyncKey) this.syncKey = savedSyncKey;
             this.autoSync = localStorage.getItem('bwl_auto_sync') === '1';
 
+            // 恢复 QQ 音乐设置
+            const savedQQMusic = JSON.parse(localStorage.getItem('bwl_qqmusic') || 'null');
+            if (savedQQMusic) {
+                this.musicMode = savedQQMusic.musicMode || 'meting';
+                this.qqMusicPlaylistId = savedQQMusic.qqMusicPlaylistId || '';
+                this.qqMusicIframeHeight = savedQQMusic.qqMusicIframeHeight || 600;
+            }
+
             // 设置背景
             this.setMainProperty();
 
-            // 获取音乐
-            await this.getMusicInfo();
+            // 获取音乐（仅 meting 模式）
+            if (this.musicMode !== 'qqmusic') {
+                await this.getMusicInfo();
+            }
 
             // 加载图片
             await this.loadImages();
