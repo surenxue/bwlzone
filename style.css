@@ -321,7 +321,7 @@ a { text-decoration: none; color: inherit; }
 }
 .dialog-content {
     background: rgba(30, 30, 45, 0.95); border-radius: 16px;
-    padding: 24px; width: 90%; max-width: 560px; max-height: 80vh;
+    padding: 24px; width: 90%; max-width: 620px; max-height: 85vh;
     overflow-y: auto; border: 1px solid rgba(255,255,255,0.1);
     backdrop-filter: blur(10px); color: #fff;
 }
@@ -392,6 +392,187 @@ a { text-decoration: none; color: inherit; }
     color: #00d4aa;
 }
 .dialog-actions button.primary:hover { background: rgba(0, 212, 170, 0.35); }
+
+/* ========== 内容编辑器 ========== */
+.content-editor {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+.edit-section {
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.edit-section-title {
+    font-size: 0.95rem;
+    color: #00d4aa;
+    margin-bottom: 10px;
+    padding-left: 4px;
+    border-left: 2px solid #00d4aa;
+}
+.edit-input {
+    width: 100%;
+    background: rgba(255,255,255,0.06);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.12);
+    padding: 7px 10px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    outline: none;
+    transition: border-color 0.3s;
+}
+.edit-input:focus {
+    border-color: #00d4aa;
+}
+.edit-input-sm {
+    flex: 1;
+}
+.edit-input-tag {
+    width: 80px;
+    background: rgba(255,255,255,0.06);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.12);
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    outline: none;
+    text-align: center;
+}
+.edit-input-tag:focus {
+    border-color: #00d4aa;
+}
+.edit-input-skill {
+    flex: 2;
+}
+.edit-input-point {
+    width: 60px;
+    background: rgba(255,255,255,0.06);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.12);
+    padding: 7px 6px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    outline: none;
+    text-align: center;
+}
+.edit-input-point:focus {
+    border-color: #00d4aa;
+}
+.edit-row {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    margin-bottom: 6px;
+}
+.edit-tags-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 8px;
+}
+.edit-tag-item {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+.edit-btn-add {
+    background: rgba(0,212,170,0.1);
+    color: #00d4aa;
+    border: 1px dashed rgba(0,212,170,0.3);
+    padding: 5px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.3s;
+    margin-top: 4px;
+}
+.edit-btn-add:hover {
+    background: rgba(0,212,170,0.2);
+    border-color: #00d4aa;
+}
+.edit-btn-del {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255,80,80,0.2);
+    color: #ff5050;
+    cursor: pointer;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.3s;
+}
+.edit-btn-del:hover {
+    background: rgba(255,80,80,0.4);
+}
+.edit-btn-del-sm {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255,80,80,0.2);
+    color: #ff5050;
+    cursor: pointer;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.3s;
+}
+.edit-btn-del-sm:hover {
+    background: rgba(255,80,80,0.4);
+}
+.edit-project-card {
+    background: rgba(255,255,255,0.03);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 10px;
+    border: 1px solid rgba(255,255,255,0.06);
+}
+.edit-project-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.6);
+}
+.edit-img-row {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+.edit-upload-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(0,212,170,0.1);
+    color: #00d4aa;
+    border: 1px solid rgba(0,212,170,0.2);
+    padding: 7px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    transition: all 0.3s;
+}
+.edit-upload-btn:hover {
+    background: rgba(0,212,170,0.2);
+}
+.edit-preview-img {
+    width: 100%;
+    max-height: 100px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-top: 6px;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+.skill-row {
+    gap: 4px;
+}
 
 /* ========== 页脚 ========== */
 .site-footer {

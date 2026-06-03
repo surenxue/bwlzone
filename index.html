@@ -34,14 +34,17 @@
                             <i class="mdi mdi-cog"></i>
                         </button>
                         <template v-if="isExpanded">
-                            <button class="switch-btn" @click="tab = 'tab-1'" :class="{ active: tab === 'tab-1' }">
+                            <button class="switch-btn" @click="tab = 'tab-1'; dialog1 = true" :class="{ active: tab === 'tab-1' }">
                                 <i class="mdi mdi-pencil-plus"></i>
                             </button>
-                            <button class="switch-btn" @click="tab = 'tab-2'" :class="{ active: tab === 'tab-2' }">
+                            <button class="switch-btn" @click="tab = 'tab-2'; dialog1 = true" :class="{ active: tab === 'tab-2' }">
                                 <i class="mdi mdi-wallpaper"></i>
                             </button>
-                            <button class="switch-btn" @click="tab = 'tab-3'" :class="{ active: tab === 'tab-3' }">
+                            <button class="switch-btn" @click="tab = 'tab-3'; dialog1 = true" :class="{ active: tab === 'tab-3' }">
                                 <i class="mdi mdi-music-circle-outline"></i>
+                            </button>
+                            <button class="switch-btn" @click="tab = 'tab-4'; dialog1 = true" :class="{ active: tab === 'tab-4' }">
+                                <i class="mdi mdi-pencil-box-multiple"></i>
                             </button>
                             <button class="switch-btn" @click="isExpanded = false">
                                 <i class="mdi mdi-close"></i>
@@ -203,6 +206,9 @@
                         <button @click="tab = 'tab-3'" :class="{ active: tab === 'tab-3' }">
                             <i class="mdi mdi-music-circle-outline"></i> 音乐
                         </button>
+                        <button @click="tab = 'tab-4'" :class="{ active: tab === 'tab-4' }">
+                            <i class="mdi mdi-pencil-box-multiple"></i> 内容
+                        </button>
                     </div>
 
                     <!-- Tab 1: 样式设置 -->
@@ -268,6 +274,108 @@
                         <p class="music-status">当前播放：{{ musicinfo && musicinfo.length ? musicinfo[playlistIndex]?.title : '加载中...' }}</p>
                         <div class="dialog-actions">
                             <button @click="dialog1 = false">关闭</button>
+                        </div>
+                    </div>
+
+                    <!-- Tab 4: 内容编辑 -->
+                    <div v-if="tab === 'tab-4'" class="tab-content content-editor">
+                        <!-- 欢迎语 -->
+                        <div class="edit-section">
+                            <h4 class="edit-section-title">欢迎语</h4>
+                            <div class="setting-group">
+                                <label>标题文字</label>
+                                <input type="text" v-model="configdata.welcometitle" class="edit-input">
+                            </div>
+                        </div>
+
+                        <!-- 打字机文字 -->
+                        <div class="edit-section">
+                            <h4 class="edit-section-title">打字机文字</h4>
+                            <div v-for="(str, idx) in configdata.typeWriterStrings" :key="'tw-'+idx" class="edit-row">
+                                <input type="text" v-model="configdata.typeWriterStrings[idx]" class="edit-input edit-input-sm">
+                                <button class="edit-btn-del" @click="removeTypeWriter(idx)" title="删除">✕</button>
+                            </div>
+                            <button class="edit-btn-add" @click="addTypeWriter">+ 添加一行</button>
+                        </div>
+
+                        <!-- 标签 -->
+                        <div class="edit-section">
+                            <h4 class="edit-section-title">标签</h4>
+                            <div class="edit-tags-list">
+                                <span v-for="(tag, idx) in configdata.tags" :key="'tag-'+idx" class="edit-tag-item">
+                                    <input type="text" v-model="configdata.tags[idx]" class="edit-input-tag">
+                                    <button class="edit-btn-del-sm" @click="removeTag(idx)">✕</button>
+                                </span>
+                            </div>
+                            <button class="edit-btn-add" @click="addTag">+ 添加标签</button>
+                        </div>
+
+                        <!-- 技能雷达 -->
+                        <div class="edit-section">
+                            <h4 class="edit-section-title">技能雷达</h4>
+                            <div v-for="(skill, idx) in configdata.polarChart.skills" :key="'sk-'+idx" class="edit-row skill-row">
+                                <input type="text" v-model="configdata.polarChart.skills[idx]" placeholder="技能名" class="edit-input edit-input-skill">
+                                <input type="number" v-model.number="configdata.polarChart.skillPoints[idx]" placeholder="分值" min="0" max="100" class="edit-input edit-input-point">
+                                <button class="edit-btn-del" @click="removeSkill(idx)">✕</button>
+                            </div>
+                            <button class="edit-btn-add" @click="addSkill">+ 添加技能</button>
+                        </div>
+
+                        <!-- 项目卡片 -->
+                        <div class="edit-section">
+                            <h4 class="edit-section-title">项目卡片</h4>
+                            <div v-for="(proj, idx) in configdata.projectcards" :key="'proj-'+idx" class="edit-project-card">
+                                <div class="edit-project-header">
+                                    <span>项目 #{{ idx + 1 }}</span>
+                                    <button class="edit-btn-del" @click="removeProject(idx)">删除</button>
+                                </div>
+                                <div class="setting-group">
+                                    <label>标题</label>
+                                    <input type="text" v-model="configdata.projectcards[idx].title" class="edit-input">
+                                </div>
+                                <div class="setting-group">
+                                    <label>副标题</label>
+                                    <input type="text" v-model="configdata.projectcards[idx].subtitle" class="edit-input">
+                                </div>
+                                <div class="setting-group">
+                                    <label>描述</label>
+                                    <input type="text" v-model="configdata.projectcards[idx].text" class="edit-input">
+                                </div>
+                                <div class="setting-group">
+                                    <label>链接</label>
+                                    <input type="text" v-model="configdata.projectcards[idx].link" class="edit-input">
+                                </div>
+                                <div class="setting-group">
+                                    <label>封面图片</label>
+                                    <div class="edit-img-row">
+                                        <input type="text" v-model="configdata.projectcards[idx].img" placeholder="图片URL" class="edit-input edit-input-sm">
+                                        <label class="edit-upload-btn">
+                                            <i class="mdi mdi-image-plus"></i> 本地上传
+                                            <input type="file" accept="image/*" style="display:none" @change="onProjectImgChange($event, idx)">
+                                        </label>
+                                    </div>
+                                    <img v-if="configdata.projectcards[idx].img" :src="configdata.projectcards[idx].img" class="edit-preview-img">
+                                </div>
+                            </div>
+                            <button class="edit-btn-add" @click="addProject">+ 添加项目</button>
+                        </div>
+
+                        <!-- 社交图标 -->
+                        <div class="edit-section">
+                            <h4 class="edit-section-title">社交图标</h4>
+                            <div v-for="(link, name, idx) in configdata.socialPlatformIcons" :key="'si-'+name" class="edit-row skill-row">
+                                <input type="text" v-model="socialIconNames[idx]" placeholder="名称" class="edit-input edit-input-skill" @input="updateSocialKey(idx)">
+                                <input type="text" v-model="socialIconLinks[idx]" placeholder="链接" class="edit-input edit-input-sm">
+                                <button class="edit-btn-del" @click="removeSocial(idx)">✕</button>
+                            </div>
+                            <button class="edit-btn-add" @click="addSocial">+ 添加社交</button>
+                        </div>
+
+                        <!-- 操作按钮 -->
+                        <div class="dialog-actions">
+                            <button @click="resetContent">恢复默认</button>
+                            <button @click="dialog1 = false">取消</button>
+                            <button class="primary" @click="saveContent">保存内容</button>
                         </div>
                     </div>
                 </div>

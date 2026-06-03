@@ -24,6 +24,16 @@ const app = createApp({
             currentTypewriterText: '',
             avatarSrc: 'img/avatar.jpg',
 
+            // 社交图标编辑（因 Vue 动态key问题，用数组辅助）
+            socialIconNames: [],
+            socialIconLinks: [],
+
+            // 原始配置备份（用于恢复默认）
+            defaultContent: null,
+
+            // 图表实例
+            polarChartInstance: null,
+
             // 主题设置
             themeColor: '#FFFFFF',
             titleColor: '#FFFFFF',
@@ -71,6 +81,9 @@ const app = createApp({
         }
     },
     watch: {
+        tab(newVal) {
+            if (newVal === 'tab-4') this.syncSocialArrays();
+        },
         isClearScreen(val) {
             if (!this.videosrc) return;
             const vd = this.$refs.VdPlayer;
@@ -270,6 +283,145 @@ const app = createApp({
             if (url) window.open(url, '_blank').focus();
         },
 
+        // ========== 内容编辑 - 社交图标同步 ==========
+        syncSocialArrays() {
+            const icons = this.configdata.socialPlatformIcons || {};
+            const keys = Object.keys(icons);
+            this.socialIconNames = [...keys];
+            this.socialIconLinks = keys.map(k => icons[k]);
+        },
+        updateSocialKey(idx) {
+            const oldKeys = Object.keys(this.configdata.socialPlatformIcons);
+            const oldKey = oldKeys[idx];
+            const newKey = this.socialIconNames[idx];
+            if (oldKey !== newKey && newKey.trim()) {
+                const entries = Object.entries(this.configdata.socialPlatformIcons);
+                entries[idx] = [newKey.trim(), this.socialIconLinks[idx] || ''];
+                this.configdata.socialPlatformIcons = Object.fromEntries(entries);
+                this.syncSocialArrays();
+            }
+        },
+
+        // ========== 内容编辑 - 打字机文字 ==========
+        addTypeWriter() {
+            this.configdata.typeWriterStrings.push('新文字...');
+        },
+        removeTypeWriter(idx) {
+            this.configdata.typeWriterStrings.splice(idx, 1);
+        },
+
+        // ========== 内容编辑 - 标签 ==========
+        addTag() {
+            this.configdata.tags.push('新标签');
+        },
+        removeTag(idx) {
+            this.configdata.tags.splice(idx, 1);
+        },
+
+        // ========== 内容编辑 - 技能 ==========
+        addSkill() {
+            this.configdata.polarChart.skills.push('新技能');
+            this.configdata.polarChart.skillPoints.push(50);
+        },
+        removeSkill(idx) {
+            this.configdata.polarChart.skills.splice(idx, 1);
+            this.configdata.polarChart.skillPoints.splice(idx, 1);
+        },
+
+        // ========== 内容编辑 - 项目卡片 ==========
+        addProject() {
+            this.configdata.projectcards.push({
+                title: '新项目',
+                subtitle: '项目描述',
+                text: '项目详情介绍',
+                img: 'img/sunshine.jpg',
+                link: 'https://bwl.top'
+            });
+        },
+        removeProject(idx) {
+            this.configdata.projectcards.splice(idx, 1);
+        },
+        onProjectImgChange(e, idx) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                this.configdata.projectcards[idx].img = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        },
+
+        // ========== 内容编辑 - 社交图标 ==========
+        addSocial() {
+            const icons = this.configdata.socialPlatformIcons || {};
+            icons['新平台'] = 'https://';
+            this.configdata.socialPlatformIcons = { ...icons };
+            this.syncSocialArrays();
+        },
+        removeSocial(idx) {
+            const keys = Object.keys(this.configdata.socialPlatformIcons);
+            const newIcons = {};
+            keys.forEach((k, i) => {
+                if (i !== idx) newIcons[k] = this.configdata.socialPlatformIcons[k];
+            });
+            this.configdata.socialPlatformIcons = newIcons;
+            this.syncSocialArrays();
+        },
+
+        // ========== 内容编辑 - 保存/恢复 ==========
+        saveContent() {
+            // 同步社交图标链接
+            const newIcons = {};
+            this.socialIconNames.forEach((name, i) => {
+                if (name.trim()) newIcons[name.trim()] = this.socialIconLinks[i] || '';
+            });
+            this.configdata.socialPlatformIcons = newIcons;
+
+            const toSave = {
+                welcometitle: this.configdata.welcometitle,
+                typeWriterStrings: [...this.configdata.typeWriterStrings],
+                tags: [...this.configdata.tags],
+                polarChart: {
+                    skills: [...this.configdata.polarChart.skills],
+                    skillPoints: [...this.configdata.polarChart.skillPoints]
+                },
+                projectcards: this.configdata.projectcards.map(p => ({ ...p })),
+                socialPlatformIcons: { ...this.configdata.socialPlatformIcons }
+            };
+            localStorage.setItem('bwl_content', JSON.stringify(toSave));
+            this.dialog1 = false;
+            // 刷新技能图
+            this.$nextTick(() => {
+                this.renderPolarChart();
+                this.restartTypewriter();
+            });
+        },
+        resetContent() {
+            if (!this.defaultContent) return;
+            this.configdata.welcometitle = this.defaultContent.welcometitle;
+            this.configdata.typeWriterStrings = [...this.defaultContent.typeWriterStrings];
+            this.configdata.tags = [...this.defaultContent.tags];
+            this.configdata.polarChart = {
+                skills: [...this.defaultContent.polarChart.skills],
+                skillPoints: [...this.defaultContent.polarChart.skillPoints]
+            };
+            this.configdata.projectcards = this.defaultContent.projectcards.map(p => ({ ...p }));
+            this.configdata.socialPlatformIcons = { ...this.defaultContent.socialPlatformIcons };
+            localStorage.removeItem('bwl_content');
+            this.syncSocialArrays();
+            this.$nextTick(() => {
+                this.renderPolarChart();
+                this.restartTypewriter();
+            });
+        },
+        restartTypewriter() {
+            if (this.typewriterTimer) clearTimeout(this.typewriterTimer);
+            this.typewriterIndex = 0;
+            this.typewriterCharIndex = 0;
+            this.currentTypewriterText = '';
+            this.$nextTick(() => this.startTypewriter());
+        },
+
         // ========== 初始化 ==========
         setMainProperty() {
             const root = document.documentElement;
@@ -319,6 +471,39 @@ const app = createApp({
         },
 
         async init() {
+            // 备份原始配置用于恢复
+            this.defaultContent = {
+                welcometitle: this.configdata.welcometitle,
+                typeWriterStrings: [...this.configdata.typeWriterStrings],
+                tags: [...this.configdata.tags],
+                polarChart: {
+                    skills: [...this.configdata.polarChart.skills],
+                    skillPoints: [...this.configdata.polarChart.skillPoints]
+                },
+                projectcards: this.configdata.projectcards.map(p => ({ ...p })),
+                socialPlatformIcons: { ...this.configdata.socialPlatformIcons }
+            };
+
+            // 加载已保存的内容
+            const savedContent = JSON.parse(localStorage.getItem('bwl_content') || 'null');
+            if (savedContent) {
+                if (savedContent.welcometitle) this.configdata.welcometitle = savedContent.welcometitle;
+                if (savedContent.typeWriterStrings) this.configdata.typeWriterStrings = [...savedContent.typeWriterStrings];
+                if (savedContent.tags) this.configdata.tags = [...savedContent.tags];
+                if (savedContent.polarChart) {
+                    this.configdata.polarChart = {
+                        skills: [...savedContent.polarChart.skills],
+                        skillPoints: [...savedContent.polarChart.skillPoints]
+                    };
+                }
+                if (savedContent.projectcards) {
+                    this.configdata.projectcards = savedContent.projectcards.map(p => ({ ...p }));
+                }
+                if (savedContent.socialPlatformIcons) {
+                    this.configdata.socialPlatformIcons = { ...savedContent.socialPlatformIcons };
+                }
+            }
+
             // 恢复头像
             const savedAvatar = localStorage.getItem('bwl_avatar');
             if (savedAvatar) {
@@ -376,6 +561,12 @@ const app = createApp({
             const { skills, skillPoints } = this.configdata.polarChart;
             if (!skills || !skillPoints) return;
 
+            // 销毁旧图表
+            if (this.polarChartInstance) {
+                this.polarChartInstance.destroy();
+                this.polarChartInstance = null;
+            }
+
             const ctx = this.$refs.polarChartRef.getContext('2d');
             const colors = skills.map(() => {
                 const r = Math.floor(Math.random() * 200 + 55);
@@ -384,7 +575,7 @@ const app = createApp({
                 return `rgba(${r},${g},${b},0.6)`;
             });
 
-            new Chart(ctx, {
+            this.polarChartInstance = new Chart(ctx, {
                 type: 'polarArea',
                 data: {
                     labels: skills,
