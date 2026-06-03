@@ -381,6 +381,34 @@ a { text-decoration: none; color: inherit; }
     display: block; margin-top: 4px; font-size: 0.75rem;
     color: rgba(255,255,255,0.35); line-height: 1.4;
 }
+.checkbox-label {
+    display: flex !important;
+    align-items: flex-start;
+    gap: 8px;
+    cursor: pointer;
+    user-select: none;
+    color: rgba(255,255,255,0.7) !important;
+    font-size: 0.85rem !important;
+    line-height: 1.4;
+}
+.checkbox-label input[type="checkbox"] {
+    width: 16px !important;
+    height: 16px;
+    accent-color: #00d4aa;
+    cursor: pointer;
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+.checkbox-label span {
+    flex: 1;
+}
+.embed-tip {
+    display: block;
+    margin-top: 6px;
+    font-size: 0.73rem;
+    color: rgba(255, 200, 50, 0.7);
+    line-height: 1.4;
+}
 .music-status {
     font-size: 0.85rem; color: rgba(255,255,255,0.5);
     margin: 12px 0;
@@ -810,6 +838,63 @@ a { text-decoration: none; color: inherit; }
     gap: 4px;
 }
 
+/* ========== QQ音乐嵌入播放器 ========== */
+.qq-embed-player {
+    position: fixed;
+    bottom: 0;
+    right: 20px;
+    width: 380px;
+    z-index: 150;
+    background: rgba(20, 20, 30, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 12px 12px 0 0;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-bottom: none;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.4);
+    transition: all 0.3s ease;
+}
+.qq-embed-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 16px;
+    cursor: pointer;
+    user-select: none;
+}
+.qq-embed-title {
+    color: #00d4aa;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.qq-embed-title::before {
+    content: '♫';
+    font-size: 1rem;
+}
+.qq-embed-close {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.5);
+    cursor: pointer;
+    font-size: 1.2rem;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+}
+.qq-embed-close:hover {
+    color: #fff;
+    background: rgba(255,255,255,0.1);
+}
+.qq-embed-body {
+    overflow: hidden;
+}
+.qq-embed-body iframe {
+    display: block;
+}
+
 /* ========== 页脚 ========== */
 .site-footer {
     position: relative; z-index: 1; text-align: center;
@@ -836,4 +921,9 @@ a { text-decoration: none; color: inherit; }
     .project-cards { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
     .musicplayer-text { font-size: 10px !important; }
     .bwl-social-bticon { width: 36px; height: 36px; font-size: 18px; }
+    .qq-embed-player {
+        right: 0;
+        width: 100%;
+        border-radius: 12px 12px 0 0;
+    }
 }

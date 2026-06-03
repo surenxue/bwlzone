@@ -328,12 +328,33 @@
                             </div>
                         </div>
 
-                        <p class="music-status" v-if="musicinfo && musicinfo.length">共 {{ musicinfo.length }} 首歌 | 当前播放：{{ musicinfo[playlistIndex]?.title }}</p>
-                        <p class="music-status" v-else-if="musicinfoLoading">加载中...</p>
-                        <p class="music-status" v-else>暂无歌曲，请输入歌单ID并点击"加载歌单"</p>
+                        <!-- QQ音乐嵌入播放器开关 -->
+                        <div class="setting-group" v-if="musicMode === 'qqmusic'">
+                            <label class="checkbox-label">
+                                <input type="checkbox" v-model="qqMusicEmbed" @change="onQQMusicEmbedChange">
+                                <span>使用官方嵌入播放器（支持VIP歌曲，需在QQ音乐登录）</span>
+                            </label>
+                            <small class="embed-tip">⚠️ 嵌入播放器需要先在浏览器中登录 y.qq.com 才能播放VIP歌曲。播放器将显示在页面右下角。</small>
+                        </div>
+
+                        <!-- 非嵌入模式的状态 -->
+                        <template v-if="!qqMusicEmbed || musicMode === 'netease'">
+                            <p class="music-status" v-if="musicinfo && musicinfo.length">共 {{ musicinfo.length }} 首歌 | 当前播放：{{ musicinfo[playlistIndex]?.title }}</p>
+                            <p class="music-status" v-else-if="musicinfoLoading">加载中...</p>
+                            <p class="music-status" v-else>暂无歌曲，请输入歌单ID并点击"加载歌单"</p>
+                        </template>
+
+                        <!-- 嵌入模式的提示 -->
+                        <p class="music-status" v-else-if="qqMusicEmbed && qqMusicPlaylistId">
+                            官方播放器已启用 | 歌单ID: {{ qqMusicPlaylistId }}
+                        </p>
+                        <p class="music-status" v-else-if="qqMusicEmbed">
+                            请输入歌单ID以启用官方播放器
+                        </p>
 
                         <div class="dialog-actions">
-                            <button class="primary" @click="loadPlaylist" :disabled="musicinfoLoading">{{ musicinfoLoading ? '加载中...' : '加载歌单' }}</button>
+                            <button v-if="!qqMusicEmbed || musicMode === 'netease'" class="primary" @click="loadPlaylist" :disabled="musicinfoLoading">{{ musicinfoLoading ? '加载中...' : '加载歌单' }}</button>
+                            <button v-if="qqMusicEmbed && musicMode === 'qqmusic'" class="primary" @click="applyQQEmbed">应用嵌入播放器</button>
                             <button @click="dialog1 = false">关闭</button>
                         </div>
                     </div>
@@ -499,6 +520,26 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- QQ音乐嵌入播放器 -->
+        <div class="qq-embed-player" v-if="!isloading && qqMusicEmbed && qqMusicPlaylistId && musicMode === 'qqmusic'">
+            <div class="qq-embed-header">
+                <span class="qq-embed-title">QQ音乐播放器</span>
+                <button class="qq-embed-close" @click="toggleQQEmbedMinimize">
+                    <i :class="qqEmbedMinimized ? 'mdi mdi-chevron-up' : 'mdi mdi-chevron-down'"></i>
+                </button>
+            </div>
+            <div class="qq-embed-body" v-show="!qqEmbedMinimized">
+                <iframe 
+                    :src="qqEmbedUrl"
+                    frameborder="0" 
+                    width="100%" 
+                    height="460"
+                    allow="autoplay"
+                    allowfullscreen>
+                </iframe>
             </div>
         </div>
 

@@ -77,6 +77,8 @@ const app = createApp({
             // QQ音乐嵌入
             musicMode: 'netease', // 'netease' | 'qqmusic'
             qqMusicPlaylistId: '',
+            qqMusicEmbed: false,      // 是否使用官方嵌入播放器
+            qqEmbedMinimized: false,  // 嵌入播放器是否最小化
 
             // 打字机
             typewriterIndex: 0,
@@ -92,7 +94,14 @@ const app = createApp({
             return this.$refs.audioPlayer;
         },
         showMusicBtn() {
+            // 嵌入模式下不显示浮动按钮
+            if (this.qqMusicEmbed && this.musicMode === 'qqmusic') return false;
             return this.musicinfo && this.musicinfo.length;
+        },
+        qqEmbedUrl() {
+            if (!this.qqMusicPlaylistId) return '';
+            // QQ音乐官方歌单嵌入页面
+            return `https://y.qq.com/n/ryqq/playlist/${this.qqMusicPlaylistId}`;
         },
         currentWallpaperList() {
             if (!this.configdata.wallpaper) return [];
@@ -244,6 +253,10 @@ const app = createApp({
             this.musicinfoLoading = false;
         },
         async getMusicInfo() {
+            // 嵌入模式下不需要通过 API 获取歌单
+            if (this.qqMusicEmbed && this.musicMode === 'qqmusic') {
+                return;
+            }
             const id = this.qqMusicPlaylistId || this.configdata.musicPlayer.id;
             await this.fetchPlaylist(id);
         },
@@ -260,14 +273,42 @@ const app = createApp({
             // 恢复默认ID
             if (mode === 'netease') {
                 this.qqMusicPlaylistId = this.configdata.musicPlayer.id;
+                this.qqMusicEmbed = false;
             } else {
                 this.qqMusicPlaylistId = '';
             }
         },
+        onQQMusicEmbedChange() {
+            this.saveQQMusicSettings();
+            if (this.qqMusicEmbed) {
+                // 关闭自定义音乐播放器
+                this.showMusicPlayer = false;
+                this.isPlaying = false;
+                if (this.audioPlayer) {
+                    this.audioPlayer.pause();
+                }
+            }
+        },
+        applyQQEmbed() {
+            if (!this.qqMusicPlaylistId) return;
+            this.qqEmbedMinimized = false;
+            this.showMusicPlayer = false;
+            this.isPlaying = false;
+            if (this.audioPlayer) {
+                this.audioPlayer.pause();
+            }
+            this.saveQQMusicSettings();
+            this.dialog1 = false;
+        },
+        toggleQQEmbedMinimize() {
+            this.qqEmbedMinimized = !this.qqEmbedMinimized;
+        },
         saveQQMusicSettings() {
             localStorage.setItem('bwl_qqmusic', JSON.stringify({
                 musicMode: this.musicMode,
-                qqMusicPlaylistId: this.qqMusicPlaylistId
+                qqMusicPlaylistId: this.qqMusicPlaylistId,
+                qqMusicEmbed: this.qqMusicEmbed,
+                qqEmbedMinimized: this.qqEmbedMinimized
             }));
         },
         togglePlay() {
@@ -844,6 +885,8 @@ const app = createApp({
             if (savedQQMusic) {
                 this.musicMode = savedQQMusic.musicMode || 'netease';
                 this.qqMusicPlaylistId = savedQQMusic.qqMusicPlaylistId || '';
+                this.qqMusicEmbed = savedQQMusic.qqMusicEmbed || false;
+                this.qqEmbedMinimized = savedQQMusic.qqEmbedMinimized || false;
             }
             // 确保默认有ID
             if (!this.qqMusicPlaylistId) {
