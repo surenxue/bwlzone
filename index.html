@@ -1,223 +1,173 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BWL Zone - 个人主页</title>
-    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Leleo的个人主页🎉</title>
+    <meta name="description" content="欢迎来到Leleo的奇妙世界！" />
+    <meta name="keywords" content="Leleo, leleo, 个人主页, 个人网站" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css" />
 </head>
 <body>
-    <!-- 导航栏 -->
-    <nav class="navbar">
-        <div class="container nav-inner">
-            <a href="#" class="logo">BWL Zone</a>
-            <ul class="nav-links">
-                <li><a href="#home">首页</a></li>
-                <li><a href="#about">关于</a></li>
-                <li><a href="#projects">项目</a></li>
-                <li><a href="#contact">联系</a></li>
-            </ul>
-        </div>
-    </nav>
+    <!-- 加载动画 -->
+    <div class="loading" id="loadingScreen">
+        <div class="spinner"></div>
+    </div>
 
-    <!-- Hero 区域 -->
-    <section id="home" class="hero">
-        <div class="container">
-            <div class="hero-content">
-                <div class="hero-text">
-                    <span class="badge">欢迎来到我的世界</span>
-                    <h1 class="hero-title">
-                        你好，我是<br>
-                        <span class="gradient-text">你的名字</span>
-                    </h1>
-                    <p class="hero-desc">
-                        热爱技术与设计，专注于创造美观实用的数字产品。
-                        探索、创造、分享 — 让每一个想法都变成现实。
-                    </p>
-                    <div class="hero-buttons">
-                        <a href="#projects" class="btn btn-primary">查看作品</a>
-                        <a href="#contact" class="btn btn-outline">联系我</a>
-                    </div>
-                </div>
-                <div class="hero-avatar-wrapper">
-                    <div class="avatar-container" id="avatarContainer">
-                        <img id="avatarImg" src="" alt="头像" style="display:none;" />
-                        <svg id="avatarSvg" class="avatar-svg" viewBox="0 0 100 100" fill="none">
-                            <circle cx="50" cy="35" r="15" fill="#00D4AA"/>
-                            <ellipse cx="50" cy="80" rx="28" ry="20" fill="#00D4AA"/>
-                        </svg>
-                        <div class="avatar-hint">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                            更换头像
+    <!-- 全屏背景 -->
+    <div class="fullscreen-bg" id="fullscreenBg">
+        <div class="bg-overlay"></div>
+        <video class="video-bg" id="videoBg" loop muted playsinline style="display:none;"></video>
+    </div>
+
+    <!-- 主内容 -->
+    <div class="main-content" id="mainContent" style="visibility:hidden;">
+        <div class="app-container">
+            <!-- 左侧面板 -->
+            <div class="left-panel">
+                <!-- 欢迎语 -->
+                <div class="welcome-text" id="welcomeText">Hi, I'm Leleo</div>
+
+                <!-- 头像区域 -->
+                <div class="avatar-section">
+                    <div class="avatar-wrapper" id="avatarWrapper">
+                        <img src="img/avatar.jpg" alt="头像" class="avatar-img" id="avatarImg" />
+                        <div class="turntable" id="turntable" style="display:none;">
+                            <svg viewBox="0 0 200 200" width="200" height="200">
+                                <defs>
+                                    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" style="stop-color:#FFFF00;stop-opacity:1" />
+                                        <stop offset="100%" style="stop-color:#00FFFF;stop-opacity:1" />
+                                    </linearGradient>
+                                </defs>
+                                <circle cx="100" cy="100" r="95" fill="none" stroke="url(#grad1)" stroke-width="3" stroke-dasharray="8 6"/>
+                                <circle cx="100" cy="100" r="80" fill="none" stroke="url(#grad1)" stroke-width="1.5" stroke-dasharray="4 8"/>
+                                <circle cx="100" cy="100" r="65" fill="none" stroke="url(#grad1)" stroke-width="1" stroke-dasharray="2 6"/>
+                                <circle cx="100" cy="100" r="30" fill="url(#grad1)" opacity="0.3"/>
+                                <circle cx="100" cy="100" r="8" fill="url(#grad1)"/>
+                            </svg>
                         </div>
-                    </div>
-                    <input type="file" id="avatarInput" accept="image/*" style="display:none;" />
-                </div>
-            </div>
-        </div>
-        <div class="scroll-hint">
-            <span>向下滚动</span>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M7 13l5 5 5-5"/>
-            </svg>
-        </div>
-    </section>
-
-    <!-- 关于我 -->
-    <section id="about" class="about">
-        <div class="container">
-            <div class="section-header">
-                <span class="section-badge">关于我</span>
-                <h2 class="section-title">了解我的故事</h2>
-                <p class="section-subtitle">热爱创造，持续学习，不断成长</p>
-            </div>
-            <div class="about-grid">
-                <div class="about-card">
-                    <div class="about-icon">🎯</div>
-                    <h3>我的目标</h3>
-                    <p>致力于成为一名优秀的全栈开发者，用技术解决实际问题，创造有价值的数字产品。</p>
-                </div>
-                <div class="about-card">
-                    <div class="about-icon">💡</div>
-                    <h3>我的理念</h3>
-                    <p>相信好的代码不仅要能运行，更要优雅可读。追求简洁高效的解决方案。</p>
-                </div>
-                <div class="about-card">
-                    <div class="about-icon">🚀</div>
-                    <h3>我的动力</h3>
-                    <p>对新技术保持好奇心，持续学习不断进步，享受从0到1的创造过程。</p>
-                </div>
-            </div>
-            <div class="stats">
-                <div class="stat-item">
-                    <span class="stat-number">5+</span>
-                    <span class="stat-label">年经验</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number">30+</span>
-                    <span class="stat-label">项目完成</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number">10+</span>
-                    <span class="stat-label">技术文章</span>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 项目展示 -->
-    <section id="projects" class="projects">
-        <div class="container">
-            <div class="section-header">
-                <span class="section-badge">作品集</span>
-                <h2 class="section-title">精选项目</h2>
-                <p class="section-subtitle">每个项目都是一次全新的探索</p>
-            </div>
-            <div class="projects-grid">
-                <div class="project-card">
-                    <div class="project-img" style="background: linear-gradient(135deg, #00D4AA, #2D1B4E);">
-                        <span>🚀</span>
-                    </div>
-                    <div class="project-body">
-                        <h3>项目名称一</h3>
-                        <p>一个创新的 Web 应用，为用户提供极致体验。</p>
-                        <div class="project-tags">
-                            <span>React</span><span>Node.js</span><span>MongoDB</span>
+                        <div class="music-player" id="musicPlayer" style="display:none;">
+                            <div class="music-info" id="musicInfo">
+                                <span class="music-title" id="musicTitle"></span>
+                                <span class="music-author" id="musicAuthor"></span>
+                            </div>
+                            <div class="music-controls">
+                                <button class="music-btn" id="prevBtn"><i class="mdi mdi-skip-previous"></i></button>
+                                <button class="music-btn" id="playBtn"><i class="mdi mdi-play"></i></button>
+                                <button class="music-btn" id="nextBtn"><i class="mdi mdi-skip-next"></i></button>
+                            </div>
+                            <div class="music-progress">
+                                <input type="range" id="musicProgress" min="0" max="100" value="0" />
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="project-card">
-                    <div class="project-img" style="background: linear-gradient(135deg, #FF6B9D, #4A3B7C);">
-                        <span>💡</span>
-                    </div>
-                    <div class="project-body">
-                        <h3>项目名称二</h3>
-                        <p>解决实际问题的工具型应用，高效实用。</p>
-                        <div class="project-tags">
-                            <span>Vue</span><span>Python</span><span>Docker</span>
-                        </div>
-                    </div>
+
+                <!-- 标签 -->
+                <div class="tags-section" id="tagsSection">
+                    <span class="tag" v-for="tag in tags">乐观开朗</span>
                 </div>
-                <div class="project-card">
-                    <div class="project-img" style="background: linear-gradient(135deg, #4A3B7C, #00D4AA);">
-                        <span>📊</span>
-                    </div>
-                    <div class="project-body">
-                        <h3>项目名称三</h3>
-                        <p>数据驱动的平台，带来显著效果提升。</p>
-                        <div class="project-tags">
-                            <span>TypeScript</span><span>Go</span><span>AWS</span>
-                        </div>
-                    </div>
+
+                <!-- 社交图标 -->
+                <div class="social-icons" id="socialIcons">
+                    <a href="https://www.github.com/leleo886" target="_blank" class="social-icon" title="GitHub">
+                        <i class="mdi mdi-github"></i>
+                    </a>
+                    <a href="mailto:leleo886@foxmail.com" class="social-icon" title="邮箱">
+                        <i class="mdi mdi-email"></i>
+                    </a>
+                    <a href="#" class="social-icon" title="QQ">
+                        <i class="mdi mdi-qqchat"></i>
+                    </a>
+                    <a href="#" class="social-icon" title="微信">
+                        <i class="mdi mdi-wechat"></i>
+                    </a>
                 </div>
             </div>
-        </div>
-    </section>
 
-    <!-- 联系 -->
-    <section id="contact" class="contact">
-        <div class="container">
-            <div class="section-header">
-                <span class="section-badge">联系我</span>
-                <h2 class="section-title">给我留言</h2>
-                <p class="section-subtitle">有任何问题或合作意向？欢迎随时联系</p>
-            </div>
-            <div class="contact-grid">
-                <div class="contact-info">
-                    <div class="contact-item">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 4L12 13 2 4"/></svg>
-                        <div>
-                            <span class="contact-label">邮箱</span>
-                            <span>2138648901@qq.com</span>
-                        </div>
-                    </div>
-                    <div class="contact-item">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-                        <div>
-                            <span class="contact-label">GitHub</span>
-                            <span>github.com/surenxue</span>
-                        </div>
+            <!-- 右侧面板 -->
+            <div class="right-panel" id="rightPanel">
+                <!-- 搜索引擎 -->
+                <div class="search-engine">
+                    <span class="engine-title">Leleo.top</span>
+                    <div class="search-box">
+                        <input type="text" placeholder="搜索..." id="searchInput" />
+                        <button id="searchBtn"><i class="mdi mdi-magnify"></i></button>
                     </div>
                 </div>
-                <form class="contact-form" onsubmit="return false;">
-                    <div class="form-group">
-                        <label>姓名</label>
-                        <input type="text" placeholder="你的姓名" required />
+
+                <!-- 时间日期 -->
+                <div class="datetime-display">
+                    <div class="time-display clock-font" id="timeDisplay">14 : 30 : 05</div>
+                    <div class="date-display" id="dateDisplay">2025年01月15日 星期三</div>
+                </div>
+
+                <!-- 部署按钮 -->
+                <div class="deploy-section">
+                    <button class="deploy-btn" id="deployBtn">
+                        <i class="mdi mdi-rocket-launch"></i> 部署项目
+                    </button>
+                </div>
+
+                <!-- 标签页切换 -->
+                <div class="tabs-nav" id="tabsNav">
+                    <button class="tab-btn active" data-tab="tab1">
+                        <i class="mdi mdi-pencil-plus"></i> 样式预览
+                    </button>
+                    <button class="tab-btn" data-tab="tab2">
+                        <i class="mdi mdi-wallpaper"></i> 背景预览
+                    </button>
+                    <button class="tab-btn" data-tab="tab3">
+                        <i class="mdi mdi-music-circle-outline"></i> 音乐播放
+                    </button>
+                </div>
+
+                <!-- Tab1: 样式预览 - 技能雷达图 -->
+                <div class="tab-content active" id="tab1">
+                    <h3 class="tab-title">技能雷达图</h3>
+                    <div class="chart-container">
+                        <canvas id="polarChart"></canvas>
                     </div>
-                    <div class="form-group">
-                        <label>邮箱</label>
-                        <input type="email" placeholder="your@email.com" required />
+                </div>
+
+                <!-- Tab2: 背景预览 -->
+                <div class="tab-content" id="tab2">
+                    <h3 class="tab-title">壁纸切换</h3>
+                    <div class="wallpaper-grid" id="wallpaperGrid"></div>
+                    <p class="tab-hint">不同壁纸在相应设备下响应</p>
+                </div>
+
+                <!-- Tab3: 音乐播放器 -->
+                <div class="tab-content" id="tab3">
+                    <h3 class="tab-title">播放列表</h3>
+                    <div class="playlist" id="playlist"></div>
+                    <div class="lyrics-display" id="lyricsDisplay" style="display:none;">
+                        <p id="currentLyric"></p>
                     </div>
-                    <div class="form-group">
-                        <label>留言内容</label>
-                        <textarea rows="5" placeholder="想对我说的话..." required></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-submit">发送留言</button>
-                </form>
+                </div>
             </div>
         </div>
-    </section>
 
-    <!-- 留言板 -->
-    <section id="guestbook" class="guestbook">
-        <div class="container">
-            <div class="section-header">
-                <span class="section-badge">留言板</span>
-                <h2 class="section-title">访客留言</h2>
-                <p class="section-subtitle">欢迎留下你的足迹</p>
-            </div>
-            <div class="message-list" id="messageList"></div>
-            <div class="pagination" id="pagination"></div>
+        <!-- 项目卡片 -->
+        <div class="projects-section" id="projectsSection">
+            <h2 class="section-title">项目作品</h2>
+            <div class="projects-grid" id="projectsGrid"></div>
         </div>
-    </section>
 
-    <!-- 页脚 -->
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; 2026 BWL Zone. All rights reserved.</p>
-        </div>
-    </footer>
+        <!-- 页脚 -->
+        <footer class="site-footer">
+            <p>备案号：XXICP备123456789号</p>
+            <p>Copyright © 2025 Leleo</p>
+        </footer>
+    </div>
 
+    <!-- 隐藏的音频播放器 -->
+    <audio id="audioPlayer" preload="none"></audio>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
