@@ -12,11 +12,11 @@
 
 /* ========== CSS 变量 ========== */
 :root {
-    --leleo-background-image-url: url('img/sunshine.jpg');
-    --leleo-welcomtitle-color: #FFFFFF;
-    --leleo-vcard-color: #FFFFFF;
-    --leleo-brightness: 85%;
-    --leleo-blur: 5px;
+    --bwl-background-image-url: url('img/sunshine.jpg');
+    --bwl-welcomtitle-color: #FFFFFF;
+    --bwl-vcard-color: #FFFFFF;
+    --bwl-brightness: 85%;
+    --bwl-blur: 5px;
 }
 
 /* ========== 滚动条 ========== */
@@ -67,16 +67,16 @@ a { text-decoration: none; color: inherit; }
     top: 0; left: 0; width: 100%; height: 100%;
 }
 .vapp-fullscreen-background::before {
-    content: ""; background-image: var(--leleo-background-image-url);
+    content: ""; background-image: var(--bwl-background-image-url);
     transition: background-image 0.8s ease;
     background-size: cover; background-position: center;
     position: absolute; width: 100%; height: 100%; z-index: -1;
-    filter: brightness(var(--leleo-brightness));
+    filter: brightness(var(--bwl-brightness));
 }
 .video-bg {
     position: fixed; z-index: -100; object-fit: cover;
     margin: auto; background-clip: padding-box;
-    filter: brightness(var(--leleo-brightness));
+    filter: brightness(var(--bwl-brightness));
     min-width: 100%; min-height: 100%;
     width: auto; height: auto;
     top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -104,21 +104,21 @@ a { text-decoration: none; color: inherit; }
     display: flex; min-height: 100vh; padding: 20px;
     position: relative; z-index: 1;
 }
-.leleo-left {
+.bwl-left {
     width: 350px; flex-shrink: 0;
     display: flex; flex-direction: column;
     align-items: center; justify-content: space-around;
     padding: 40px 20px;
 }
-.leleo-right {
+.bwl-right {
     flex: 1; padding: 20px 30px;
     overflow-y: auto; max-height: 100vh;
     scrollbar-width: none;
 }
-.leleo-right::-webkit-scrollbar { width: 0; }
+.bwl-right::-webkit-scrollbar { width: 0; }
 
 /* ========== 左侧 - 头像 ========== */
-.leleo-left-avatar { position: relative; }
+.bwl-left-avatar { position: relative; }
 .avatar-wrapper {
     width: 200px; height: 200px; border-radius: 50%;
     overflow: hidden; cursor: pointer; position: relative;
@@ -146,8 +146,8 @@ a { text-decoration: none; color: inherit; }
 }
 
 /* ========== 左侧 - 欢迎标题 ========== */
-.leleo-left-welcome {
-    width: 100%; color: var(--leleo-welcomtitle-color);
+.bwl-left-welcome {
+    width: 100%; color: var(--bwl-welcomtitle-color);
     padding: 0 10px; text-align: center;
 }
 .welcome-title { font-size: 2rem; margin-bottom: 12px; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
@@ -163,14 +163,14 @@ a { text-decoration: none; color: inherit; }
     display: flex; gap: 16px; flex-wrap: wrap;
     justify-content: center;
 }
-.leleo-social-bticon {
+.bwl-social-bticon {
     width: 44px; height: 44px; border-radius: 50%;
     background: rgba(255,255,255,0.1); color: #fff;
     display: flex; align-items: center; justify-content: center;
     font-size: 22px; transition: all 0.3s;
     backdrop-filter: blur(5px);
 }
-.leleo-social-bticon:hover {
+.bwl-social-bticon:hover {
     transform: scale(1.2); background: rgba(0, 212, 170, 0.3);
     color: #00d4aa;
 }
@@ -209,7 +209,7 @@ a { text-decoration: none; color: inherit; }
 
 /* ========== 通用 section ========== */
 .section-label {
-    color: var(--leleo-welcomtitle-color); font-size: 1.1rem;
+    color: var(--bwl-welcomtitle-color); font-size: 1.1rem;
     margin-bottom: 12px; padding-left: 4px;
     border-left: 3px solid #00d4aa;
 }
@@ -218,9 +218,9 @@ a { text-decoration: none; color: inherit; }
 .tags-section { margin-bottom: 24px; }
 .tags-container { display: flex; flex-wrap: wrap; gap: 8px; }
 .tag-item {
-    background: rgba(255,255,255,0.08); color: var(--leleo-vcard-color);
+    background: rgba(255,255,255,0.08); color: var(--bwl-vcard-color);
     padding: 6px 16px; border-radius: 20px; font-size: 0.85rem;
-    backdrop-filter: blur(var(--leleo-blur));
+    backdrop-filter: blur(var(--bwl-blur));
     border: 1px solid rgba(255,255,255,0.1);
     transition: all 0.3s;
 }
@@ -231,7 +231,7 @@ a { text-decoration: none; color: inherit; }
 .chart-wrapper {
     background: rgba(30, 30, 40, 0.5);
     border-radius: 16px; padding: 16px;
-    backdrop-filter: blur(var(--leleo-blur));
+    backdrop-filter: blur(var(--bwl-blur));
     border: 1px solid rgba(255,255,255,0.1);
 }
 #polarChart { max-width: 100%; max-height: 320px; }
@@ -245,7 +245,7 @@ a { text-decoration: none; color: inherit; }
 .project-card {
     background: rgba(30, 30, 40, 0.5);
     border-radius: 12px; overflow: hidden; cursor: pointer;
-    backdrop-filter: blur(var(--leleo-blur));
+    backdrop-filter: blur(var(--bwl-blur));
     border: 1px solid rgba(255,255,255,0.1);
     transition: all 0.3s;
 }
@@ -254,7 +254,7 @@ a { text-decoration: none; color: inherit; }
     width: 100%; height: 140px; object-fit: cover;
 }
 .project-card-info { padding: 12px 16px; }
-.project-card-info h4 { color: var(--leleo-vcard-color); font-size: 1rem; margin-bottom: 4px; }
+.project-card-info h4 { color: var(--bwl-vcard-color); font-size: 1rem; margin-bottom: 4px; }
 .project-card-info p { color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-bottom: 6px; }
 .project-card-info small { color: rgba(255,255,255,0.4); font-size: 0.8rem; }
 
@@ -263,7 +263,7 @@ a { text-decoration: none; color: inherit; }
 .stack-icons { display: flex; gap: 16px; flex-wrap: wrap; }
 .stack-icon-item {
     display: flex; align-items: center; gap: 6px;
-    color: var(--leleo-vcard-color); font-size: 0.9rem;
+    color: var(--bwl-vcard-color); font-size: 0.9rem;
     background: rgba(255,255,255,0.06); padding: 6px 14px;
     border-radius: 20px; border: 1px solid rgba(255,255,255,0.08);
 }
@@ -405,11 +405,11 @@ a { text-decoration: none; color: inherit; }
 /* ========== 响应式 ========== */
 @media (max-width: 960px) {
     .main-container { flex-direction: column; padding: 10px; }
-    .leleo-left {
+    .bwl-left {
         width: 100%; flex-shrink: 1; padding: 20px 10px;
         height: auto; gap: 16px;
     }
-    .leleo-right { padding: 10px; max-height: none; }
+    .bwl-right { padding: 10px; max-height: none; }
     .avatar-wrapper { width: 140px; height: 140px; }
     .welcome-title { font-size: 1.5rem; }
     .right-top-row { flex-direction: column; align-items: stretch; }
@@ -417,5 +417,5 @@ a { text-decoration: none; color: inherit; }
     .clock-time { font-size: 2rem; }
     .project-cards { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
     .musicplayer-text { font-size: 10px !important; }
-    .leleo-social-bticon { width: 36px; height: 36px; font-size: 18px; }
+    .bwl-social-bticon { width: 36px; height: 36px; font-size: 18px; }
 }

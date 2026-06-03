@@ -4,9 +4,9 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/x-icon" href="img/avatar.jpg">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="欢迎来到Leleo的奇妙世界！">
-    <meta name="keywords" content="Leleo,leleo,个人主页,个人网站">
-    <title>Leleo的个人主页🎉</title>
+    <meta name="description" content="欢迎来到BWL的角落！">
+    <meta name="keywords" content="BWL,bwl,BWL的角落,个人主页,个人网站">
+    <title>BWL的角落</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/vuetify@3.5.17/dist/vuetify.min.css" rel="stylesheet">
@@ -54,9 +54,9 @@
             <!-- 主内容区 -->
             <div class="main-container" v-if="!isloading">
                 <!-- 左侧区域 -->
-                <div class="leleo-left">
+                <div class="bwl-left">
                     <!-- 头像区域 -->
-                    <div class="leleo-left-avatar">
+                    <div class="bwl-left-avatar">
                         <div class="avatar-wrapper" @click="$refs.avatarInput.click()">
                             <input type="file" ref="avatarInput" accept="image/*" style="display:none" @change="onAvatarChange">
                             <img :src="avatarSrc" class="avatar-img fade-in" alt="avatar">
@@ -68,7 +68,7 @@
                     </div>
 
                     <!-- 欢迎标题 -->
-                    <div class="leleo-left-welcome">
+                    <div class="bwl-left-welcome">
                         <h2 class="welcome-title">{{ configdata.welcometitle }}</h2>
                         <div class="typewriter-container">
                             <span class="typewriter-text">{{ currentTypewriterText }}</span>
@@ -77,10 +77,10 @@
                     </div>
 
                     <!-- 社交图标 -->
-                    <div class="leleo-left-socialIconsContainer">
+                    <div class="bwl-left-socialIconsContainer">
                         <div class="social-icons">
                             <a v-for="(link, name) in configdata.socialPlatformIcons" :key="name"
-                               :href="link" target="_blank" class="leleo-social-bticon" :title="name">
+                               :href="link" target="_blank" class="bwl-social-bticon" :title="name">
                                 <i :class="getSocialIcon(name)"></i>
                             </a>
                         </div>
@@ -88,7 +88,7 @@
                 </div>
 
                 <!-- 右侧区域 -->
-                <div class="leleo-right">
+                <div class="bwl-right">
                     <!-- 搜索引擎 + 时钟 -->
                     <div class="right-top-row">
                         <div class="search-engine-selector">
@@ -276,8 +276,8 @@
 
         <!-- 页脚 -->
         <footer class="site-footer" v-if="!isloading">
-            <p>{{ configdata.statement?.icp || 'XXICP备123456789号' }}</p>
-            <p>{{ configdata.statement?.copyright || 'Copyright © 2025 Leleo' }}</p>
+            <p v-if="configdata.statement?.icp">{{ configdata.statement.icp }}</p>
+            <p>{{ configdata.statement?.copyright || 'Copyright © 2025 BWL' }}</p>
         </footer>
     </div>
 
@@ -285,13 +285,13 @@
 // ========== 配置文件 ==========
 const config = {
     metaData: {
-        title: "Leleo的个人主页🎉",
-        description: "欢迎来到Leleo的奇妙世界！",
-        keywords: "Leleo,leleo,个人主页,个人网站",
+        title: "BWL的角落",
+        description: "欢迎来到BWL的角落！",
+        keywords: "BWL,bwl,BWL的角落,个人主页,个人网站",
         icon: "/favicon.ico"
     },
     avatar: "img/avatar.jpg",
-    welcometitle: "Hi, I'm Leleo",
+    welcometitle: "Hi, 欢迎来到BWL的角落",
     color: {
         themecolor: "#FFFFFF",
         welcometitlecolor: "#FFFFFF",
@@ -306,8 +306,8 @@ const config = {
         skillPoints: [85, 78, 88, 90, 80, 78, 85, 65, 82, 78, 70]
     },
     socialPlatformIcons: {
-        "GitHub": "https://www.github.com/leleo886",
-        "Email": "mailto:leleo886@foxmail.com",
+        "GitHub": "https://www.github.com/bwlzone",
+        "Email": "mailto:bwl@foxmail.com",
         "QQ": "https://im.qq.com/",
         "WeChat": "https://wx.qq.com/",
         "YouTube": "https://www.youtube.com",
@@ -359,18 +359,18 @@ const config = {
         ]
     },
     projectcards: [
-        { title: "Project 1", subtitle: "项目描述", text: "项目详情介绍", img: "img/sunshine.jpg", link: "https://leleo.top" },
-        { title: "Project 2", subtitle: "项目描述", text: "项目详情介绍", img: "img/sunshine.jpg", link: "https://leleo.top" },
-        { title: "Project 3", subtitle: "项目描述", text: "项目详情介绍", img: "img/sunshine.jpg", link: "https://leleo.top" },
-        { title: "Project 4", subtitle: "项目描述", text: "项目详情介绍", img: "img/sunshine.jpg", link: "https://leleo.top" },
-        { title: "Project 5", subtitle: "项目描述", text: "项目详情介绍", img: "img/sunshine.jpg", link: "https://leleo.top" },
-        { title: "Project 6", subtitle: "项目描述", text: "项目详情介绍", img: "img/sunshine.jpg", link: "https://leleo.top" },
-        { title: "Project 7", subtitle: "项目描述", text: "项目详情介绍", img: "img/sunshine.jpg", link: "https://leleo.top" },
-        { title: "Project 8", subtitle: "项目描述", text: "项目详情介绍", img: "img/sunshine.jpg", link: "https://leleo.top" }
+        { title: "Project 1", subtitle: "项目描述", text: "项目详情介绍", img: "img/sunshine.jpg", link: "https://bwl.top" },
+        { title: "Project 2", subtitle: "项目描述", text: "项目详情介绍", img: "img/sunshine.jpg", link: "https://bwl.top" },
+        { title: "Project 3", subtitle: "项目描述", text: "项目详情介绍", img: "img/sunshine.jpg", link: "https://bwl.top" },
+        { title: "Project 4", subtitle: "项目描述", text: "项目详情介绍", img: "img/sunshine.jpg", link: "https://bwl.top" },
+        { title: "Project 5", subtitle: "项目描述", text: "项目详情介绍", img: "img/sunshine.jpg", link: "https://bwl.top" },
+        { title: "Project 6", subtitle: "项目描述", text: "项目详情介绍", img: "img/sunshine.jpg", link: "https://bwl.top" },
+        { title: "Project 7", subtitle: "项目描述", text: "项目详情介绍", img: "img/sunshine.jpg", link: "https://bwl.top" },
+        { title: "Project 8", subtitle: "项目描述", text: "项目详情介绍", img: "img/sunshine.jpg", link: "https://bwl.top" }
     ],
     statement: {
-        icp: "XXICP备123456789号",
-        copyright: "Copyright © 2025 Leleo"
+        icp: "",
+        copyright: "Copyright © 2025 BWL"
     }
 };
 

@@ -106,7 +106,7 @@ const app = createApp({
             const reader = new FileReader();
             reader.onload = (event) => {
                 this.avatarSrc = event.target.result;
-                localStorage.setItem('leleo_avatar', event.target.result);
+                localStorage.setItem('bwl_avatar', event.target.result);
             };
             reader.readAsDataURL(file);
         },
@@ -202,10 +202,10 @@ const app = createApp({
         // ========== 设置 - 样式 ==========
         applyTheme() {
             const root = document.documentElement;
-            root.style.setProperty('--leleo-welcomtitle-color', this.titleColor);
-            root.style.setProperty('--leleo-vcard-color', this.themeColor);
-            root.style.setProperty('--leleo-brightness', this.brightness + '%');
-            root.style.setProperty('--leleo-blur', this.blur + 'px');
+            root.style.setProperty('--bwl-welcomtitle-color', this.titleColor);
+            root.style.setProperty('--bwl-vcard-color', this.themeColor);
+            root.style.setProperty('--bwl-brightness', this.brightness + '%');
+            root.style.setProperty('--bwl-blur', this.blur + 'px');
         },
         resetStyle() {
             this.themeColor = this.configdata.color?.themecolor || '#FFFFFF';
@@ -220,7 +220,7 @@ const app = createApp({
                 brightness: this.brightness,
                 blur: this.blur
             };
-            localStorage.setItem('leleodata', JSON.stringify(data));
+            localStorage.setItem('bwldata', JSON.stringify(data));
             this.dialog1 = false;
             this.applyTheme();
         },
@@ -238,7 +238,7 @@ const app = createApp({
                 if (wp) {
                     if (this.wallpaperType === 'pic') {
                         const root = document.documentElement;
-                        root.style.setProperty('--leleo-background-image-url', `url('${wp.url}')`);
+                        root.style.setProperty('--bwl-background-image-url', `url('${wp.url}')`);
                         this.videosrc = '';
                     } else {
                         this.videosrc = wp.url;
@@ -250,7 +250,7 @@ const app = createApp({
                 pc: { type: this.wallpaperDevice === 'pc' ? this.wallpaperType : 'pic', datainfo: this.wallpaperDevice === 'pc' && this.selectedWallpaperIdx >= 0 ? this.currentWallpaperList[this.selectedWallpaperIdx] : null },
                 mobile: { type: this.wallpaperDevice === 'mobile' ? this.wallpaperType : 'pic', datainfo: this.wallpaperDevice === 'mobile' && this.selectedWallpaperIdx >= 0 ? this.currentWallpaperList[this.selectedWallpaperIdx] : null }
             };
-            localStorage.setItem('leleodatabackground', JSON.stringify(bgData));
+            localStorage.setItem('bwldatabackground', JSON.stringify(bgData));
             this.dialog1 = false;
         },
 
@@ -264,12 +264,12 @@ const app = createApp({
             const root = document.documentElement;
 
             // 读取已保存的主题
-            const leleodata = JSON.parse(localStorage.getItem('leleodata') || 'null');
-            if (leleodata) {
-                this.themeColor = leleodata.color?.themecolor || '#FFFFFF';
-                this.titleColor = leleodata.color?.welcometitlecolor || '#FFFFFF';
-                this.brightness = leleodata.brightness || 85;
-                this.blur = leleodata.blur || 5;
+            const bwldata = JSON.parse(localStorage.getItem('bwldata') || 'null');
+            if (bwldata) {
+                this.themeColor = bwldata.color?.themecolor || '#FFFFFF';
+                this.titleColor = bwldata.color?.welcometitlecolor || '#FFFFFF';
+                this.brightness = bwldata.brightness || 85;
+                this.blur = bwldata.blur || 5;
             } else {
                 this.themeColor = this.configdata.color?.themecolor || '#FFFFFF';
                 this.titleColor = this.configdata.color?.welcometitlecolor || '#FFFFFF';
@@ -279,14 +279,14 @@ const app = createApp({
             this.applyTheme();
 
             // 读取已保存的壁纸
-            const bgData = JSON.parse(localStorage.getItem('leleodatabackground') || 'null');
+            const bgData = JSON.parse(localStorage.getItem('bwldatabackground') || 'null');
             const isMobile = window.innerWidth <= 960;
 
             if (bgData) {
                 const deviceData = isMobile ? bgData.mobile : bgData.pc;
                 if (deviceData && deviceData.datainfo) {
                     if (deviceData.type === 'pic') {
-                        root.style.setProperty('--leleo-background-image-url', `url('${deviceData.datainfo.url}')`);
+                        root.style.setProperty('--bwl-background-image-url', `url('${deviceData.datainfo.url}')`);
                     } else {
                         this.videosrc = deviceData.datainfo.url;
                     }
@@ -298,7 +298,7 @@ const app = createApp({
                     const deviceData = isMobile ? defaultBg.mobile : defaultBg.pc;
                     if (deviceData && deviceData.datainfo) {
                         if (deviceData.type === 'pic') {
-                            root.style.setProperty('--leleo-background-image-url', `url('${deviceData.datainfo.url}')`);
+                            root.style.setProperty('--bwl-background-image-url', `url('${deviceData.datainfo.url}')`);
                         } else {
                             this.videosrc = deviceData.datainfo.url;
                         }
@@ -309,7 +309,7 @@ const app = createApp({
 
         async init() {
             // 恢复头像
-            const savedAvatar = localStorage.getItem('leleo_avatar');
+            const savedAvatar = localStorage.getItem('bwl_avatar');
             if (savedAvatar) this.avatarSrc = savedAvatar;
 
             // 设置背景
