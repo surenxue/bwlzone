@@ -194,17 +194,22 @@
             </div>
         </div>
 
-        <!-- QQ音乐 iframe 播放器 -->
-        <div class="qqmusic-iframe-container" v-if="!isloading && musicMode === 'qqmusic' && qqMusicPlaylistId && showMusicPlayer">
-            <div class="qqmusic-iframe-header" @click="showMusicPlayer = false">
-                <i class="mdi mdi-chevron-down"></i> 收起
+        <!-- QQ音乐弹窗播放器 -->
+        <div class="qqmusic-overlay" v-if="!isloading && musicMode === 'qqmusic' && qqMusicPlaylistId && showMusicPlayer" @click.self="showMusicPlayer = false">
+            <div class="qqmusic-window">
+                <div class="qqmusic-window-header">
+                    <span>QQ音乐</span>
+                    <button class="qqmusic-close-btn" @click="showMusicPlayer = false">
+                        <i class="mdi mdi-close"></i>
+                    </button>
+                </div>
+                <iframe
+                    :src="'https://y.qq.com/n/ryqq/playlist/' + qqMusicPlaylistId"
+                    :style="{ height: qqMusicIframeHeight + 'px' }"
+                    frameborder="0"
+                    allowfullscreen
+                ></iframe>
             </div>
-            <iframe
-                :src="'https://y.qq.com/n/ryqq/playlist/' + qqMusicPlaylistId"
-                :style="{ height: qqMusicIframeHeight + 'px' }"
-                frameborder="0"
-                allowfullscreen
-            ></iframe>
         </div>
 
         <!-- 音乐播放器按钮 -->
