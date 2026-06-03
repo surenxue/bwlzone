@@ -256,6 +256,46 @@ section { padding: 100px 0; }
 .form-group textarea:focus { border-color: var(--accent); }
 .form-group textarea { resize: none; }
 
+/* ========== 留言板 ========== */
+.guestbook { background: rgba(45, 27, 78, 0.15); }
+.message-list { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+.message-item {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 20px 24px;
+    transition: all var(--transition);
+}
+.message-item:hover { border-color: var(--accent); transform: translateY(-2px); }
+.message-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 10px;
+}
+.message-name {
+    font-size: 1rem; font-weight: 600; color: var(--accent);
+}
+.message-time { font-size: 0.8rem; color: var(--text-muted); }
+.message-content {
+    font-size: 0.95rem; color: var(--text-secondary);
+    line-height: 1.7; word-break: break-word;
+}
+.pagination {
+    display: flex; justify-content: center; gap: 8px;
+    margin-top: 32px; flex-wrap: wrap;
+}
+.page-btn {
+    padding: 8px 16px; background: var(--bg-card);
+    border: 1px solid var(--border); border-radius: 8px;
+    color: var(--text-secondary); cursor: pointer;
+    font-size: 0.9rem; transition: all var(--transition);
+}
+.page-btn:hover, .page-btn.active {
+    border-color: var(--accent); color: var(--accent);
+    background: rgba(0, 212, 170, 0.08);
+}
+.empty-message {
+    text-align: center; padding: 48px 20px;
+    color: var(--text-muted); font-size: 1rem;
+}
+
 /* ========== 页脚 ========== */
 .footer {
     padding: 32px 0; text-align: center;
