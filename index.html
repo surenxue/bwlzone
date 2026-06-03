@@ -165,8 +165,8 @@
             </div>
         </div>
 
-        <!-- 音乐播放器栏 (Meting 模式) -->
-        <div class="music-bar" v-if="!isloading && musicMode === 'meting' && musicinfo && musicinfo.length && showMusicPlayer">
+        <!-- 音乐播放器栏 -->
+        <div class="music-bar" v-if="!isloading && musicinfo && musicinfo.length && showMusicPlayer">
             <div class="music-controls">
                 <button @click="previousTrack" :disabled="audioLoading"><i class="mdi mdi-skip-previous"></i></button>
                 <button @click="togglePlay" :disabled="audioLoading">
@@ -191,24 +191,6 @@
                     <span class="pl-title">{{ song.title }}</span>
                     <span class="pl-author">{{ song.author }}</span>
                 </div>
-            </div>
-        </div>
-
-        <!-- QQ音乐弹窗播放器 -->
-        <div class="qqmusic-overlay" v-if="!isloading && musicMode === 'qqmusic' && qqMusicPlaylistId && showMusicPlayer" @click.self="showMusicPlayer = false">
-            <div class="qqmusic-window">
-                <div class="qqmusic-window-header">
-                    <span>QQ音乐</span>
-                    <button class="qqmusic-close-btn" @click="showMusicPlayer = false">
-                        <i class="mdi mdi-close"></i>
-                    </button>
-                </div>
-                <iframe
-                    :src="'https://y.qq.com/n/ryqq/playlist/' + qqMusicPlaylistId"
-                    :style="{ height: qqMusicIframeHeight + 'px' }"
-                    frameborder="0"
-                    allowfullscreen
-                ></iframe>
             </div>
         </div>
 
@@ -330,34 +312,28 @@
                     <!-- Tab 3: 音乐播放 -->
                     <div v-if="tab === 'tab-3'" class="tab-content">
                         <div class="music-mode-switch">
-                            <label>播放器模式</label>
+                            <label>音乐来源</label>
                             <div class="mode-btns">
-                                <button class="mode-btn" :class="{ active: musicMode === 'meting' }" @click="switchMusicMode('meting')">默认播放器</button>
-                                <button class="mode-btn" :class="{ active: musicMode === 'qqmusic' }" @click="switchMusicMode('qqmusic')">QQ音乐嵌入</button>
+                                <button class="mode-btn" :class="{ active: musicMode === 'netease' }" @click="switchMusicMode('netease')">网易云</button>
+                                <button class="mode-btn" :class="{ active: musicMode === 'qqmusic' }" @click="switchMusicMode('qqmusic')">QQ音乐</button>
                             </div>
                         </div>
 
-                        <!-- Meting 模式 -->
-                        <div v-if="musicMode === 'meting'">
-                            <p class="music-status">当前播放：{{ musicinfo && musicinfo.length ? musicinfo[playlistIndex]?.title : '加载中...' }}</p>
+                        <div class="setting-group">
+                            <label>歌单ID</label>
+                            <div class="input-with-tip">
+                                <input v-model="qqMusicPlaylistId" :placeholder="musicMode==='qqmusic'?'输入QQ音乐歌单ID':'输入网易云歌单ID'" @change="onPlaylistIdChange" />
+                                <small v-if="musicMode==='qqmusic'">在QQ音乐中打开歌单，从地址栏复制数字ID。如 y.qq.com/n/ryqq/playlist/<b>123456</b></small>
+                                <small v-else>在网易云中打开歌单，从地址栏复制数字ID。如 music.163.com/playlist?id=<b>123456</b></small>
+                            </div>
                         </div>
 
-                        <!-- QQ音乐模式 -->
-                        <div v-if="musicMode === 'qqmusic'" class="qqmusic-settings">
-                            <div class="setting-group">
-                                <label>QQ音乐歌单ID</label>
-                                <div class="input-with-tip">
-                                    <input v-model="qqMusicPlaylistId" placeholder="输入QQ音乐歌单ID" @input="saveQQMusicSettings" />
-                                    <small>在QQ音乐中打开歌单，从地址栏复制数字ID。例如 https://y.qq.com/n/ryqq/playlist/<b>123456</b></small>
-                                </div>
-                            </div>
-                            <div class="setting-group">
-                                <label>播放器高度</label>
-                                <input v-model.number="qqMusicIframeHeight" type="number" min="300" max="1200" step="50" @input="saveQQMusicSettings" />
-                            </div>
-                        </div>
+                        <p class="music-status" v-if="musicinfo && musicinfo.length">共 {{ musicinfo.length }} 首歌 | 当前播放：{{ musicinfo[playlistIndex]?.title }}</p>
+                        <p class="music-status" v-else-if="musicinfoLoading">加载中...</p>
+                        <p class="music-status" v-else>暂无歌曲，请输入歌单ID并点击"加载歌单"</p>
 
                         <div class="dialog-actions">
+                            <button class="primary" @click="loadPlaylist" :disabled="musicinfoLoading">{{ musicinfoLoading ? '加载中...' : '加载歌单' }}</button>
                             <button @click="dialog1 = false">关闭</button>
                         </div>
                     </div>

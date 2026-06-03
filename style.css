@@ -342,43 +342,6 @@ a { text-decoration: none; color: inherit; }
 }
 
 
-/* ========== QQ音乐弹窗播放器 ========== */
-.qqmusic-overlay {
-    position: fixed; inset: 0; z-index: 300;
-    background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
-    display: flex; align-items: center; justify-content: center;
-    animation: fadeIn 0.2s ease;
-}
-.qqmusic-window {
-    width: 90vw; max-width: 480px; max-height: 85vh;
-    background: rgba(20, 22, 35, 0.97);
-    border-radius: 16px; overflow: hidden;
-    border: 1px solid rgba(0,212,170,0.25);
-    box-shadow: 0 8px 40px rgba(0,0,0,0.5);
-    animation: scaleIn 0.25s ease;
-}
-.qqmusic-window-header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 12px 20px;
-    border-bottom: 1px solid rgba(255,255,255,0.06);
-    color: #fff; font-size: 0.95rem; font-weight: 500;
-}
-.qqmusic-close-btn {
-    width: 32px; height: 32px; border-radius: 8px;
-    border: none; background: rgba(255,255,255,0.06);
-    color: rgba(255,255,255,0.6); cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.1rem; transition: all 0.2s;
-}
-.qqmusic-close-btn:hover {
-    background: rgba(255,80,80,0.2); color: #ff5050;
-}
-.qqmusic-window iframe {
-    width: 100%; border: none;
-    transition: height 0.3s;
-}
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
 
 /* ========== 音乐模式切换 ========== */
 .music-mode-switch { margin-bottom: 16px; }
@@ -399,24 +362,28 @@ a { text-decoration: none; color: inherit; }
     color: #00d4aa;
 }
 
-/* QQ音乐设置 */
-.qqmusic-settings .setting-group { margin-bottom: 16px; }
-.qqmusic-settings .setting-group label {
+/* 歌单设置通用 */
+.tab-content .setting-group { margin-bottom: 16px; }
+.tab-content .setting-group label {
     display: block; font-size: 0.8rem; color: rgba(255,255,255,0.5);
     margin-bottom: 6px;
 }
-.qqmusic-settings .setting-group input {
+.tab-content .setting-group input {
     width: 100%; padding: 8px 12px; border-radius: 6px;
     background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1);
     color: #fff; font-size: 0.9rem; outline: none;
     transition: border-color 0.2s;
 }
-.qqmusic-settings .setting-group input:focus {
+.tab-content .setting-group input:focus {
     border-color: #00d4aa;
 }
 .input-with-tip small {
     display: block; margin-top: 4px; font-size: 0.75rem;
     color: rgba(255,255,255,0.35); line-height: 1.4;
+}
+.music-status {
+    font-size: 0.85rem; color: rgba(255,255,255,0.5);
+    margin: 12px 0;
 }
 
 /* ========== 设置弹窗 ========== */

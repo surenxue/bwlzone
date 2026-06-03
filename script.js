@@ -75,9 +75,8 @@ const app = createApp({
             ],
 
             // QQ音乐嵌入
-            musicMode: 'meting', // 'meting' | 'qqmusic'
+            musicMode: 'netease', // 'netease' | 'qqmusic'
             qqMusicPlaylistId: '',
-            qqMusicIframeHeight: 600,
 
             // 打字机
             typewriterIndex: 0,
@@ -93,9 +92,6 @@ const app = createApp({
             return this.$refs.audioPlayer;
         },
         showMusicBtn() {
-            if (this.musicMode === 'qqmusic') {
-                return !!this.qqMusicPlaylistId;
-            }
             return this.musicinfo && this.musicinfo.length;
         },
         currentWallpaperList() {
@@ -218,36 +214,60 @@ const app = createApp({
         },
 
         // ========== 音乐 ==========
-        async getMusicInfo() {
+        getMusicServer() {
+            return this.musicMode === 'qqmusic' ? 'tencent' : 'netease';
+        },
+        async fetchPlaylist(playlistId) {
+            if (!playlistId) return;
             this.musicinfoLoading = true;
             try {
-                const { server, type, id } = this.configdata.musicPlayer;
+                const server = this.getMusicServer();
                 const controller = new AbortController();
                 const timeout = setTimeout(() => controller.abort(), 8000);
-                const resp = await fetch(`https://api.i-meto.com/meting/api?server=${server}&type=${type}&id=${id}`, { signal: controller.signal });
+                const resp = await fetch(
+                    `https://api.i-meto.com/meting/api?server=${server}&type=playlist&id=${playlistId}`,
+                    { signal: controller.signal }
+                );
                 clearTimeout(timeout);
                 if (!resp.ok) throw new Error('网络请求失败');
-                this.musicinfo = await resp.json();
-                this.musicinfoLoading = false;
+                const data = await resp.json();
+                if (data && data.length) {
+                    this.musicinfo = data;
+                    this.playlistIndex = 0;
+                } else {
+                    this.musicinfo = [];
+                }
             } catch (err) {
-                console.error('音乐请求失败:', err);
-                this.musicinfoLoading = false;
-                this.musicinfo = []; // 设为空数组防止页面卡住
+                console.error('获取歌单失败:', err);
+                this.musicinfo = [];
             }
+            this.musicinfoLoading = false;
         },
-        // QQ音乐切换
+        async getMusicInfo() {
+            const id = this.qqMusicPlaylistId || this.configdata.musicPlayer.id;
+            await this.fetchPlaylist(id);
+        },
+        loadPlaylist() {
+            this.fetchPlaylist(this.qqMusicPlaylistId);
+        },
+        onPlaylistIdChange() {
+            this.saveQQMusicSettings();
+        },
         switchMusicMode(mode) {
             this.musicMode = mode;
+            this.musicinfo = null;
             this.saveQQMusicSettings();
-            if (mode === 'meting' && !this.musicinfo) {
-                this.getMusicInfo();
+            // 恢复默认ID
+            if (mode === 'netease') {
+                this.qqMusicPlaylistId = this.configdata.musicPlayer.id;
+            } else {
+                this.qqMusicPlaylistId = '';
             }
         },
         saveQQMusicSettings() {
             localStorage.setItem('bwl_qqmusic', JSON.stringify({
                 musicMode: this.musicMode,
-                qqMusicPlaylistId: this.qqMusicPlaylistId,
-                qqMusicIframeHeight: this.qqMusicIframeHeight
+                qqMusicPlaylistId: this.qqMusicPlaylistId
             }));
         },
         togglePlay() {
@@ -822,18 +842,19 @@ const app = createApp({
             // 恢复 QQ 音乐设置
             const savedQQMusic = JSON.parse(localStorage.getItem('bwl_qqmusic') || 'null');
             if (savedQQMusic) {
-                this.musicMode = savedQQMusic.musicMode || 'meting';
+                this.musicMode = savedQQMusic.musicMode || 'netease';
                 this.qqMusicPlaylistId = savedQQMusic.qqMusicPlaylistId || '';
-                this.qqMusicIframeHeight = savedQQMusic.qqMusicIframeHeight || 600;
+            }
+            // 确保默认有ID
+            if (!this.qqMusicPlaylistId) {
+                this.qqMusicPlaylistId = this.configdata.musicPlayer.id;
             }
 
             // 设置背景
             this.setMainProperty();
 
-            // 获取音乐（仅 meting 模式）
-            if (this.musicMode !== 'qqmusic') {
-                await this.getMusicInfo();
-            }
+            // 获取音乐
+            await this.getMusicInfo();
 
             // 加载图片
             await this.loadImages();
