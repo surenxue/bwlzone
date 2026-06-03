@@ -325,6 +325,22 @@ a { text-decoration: none; color: inherit; }
 .pl-title { flex: 1; }
 .pl-author { color: rgba(255,255,255,0.3); font-size: 0.8rem; }
 
+/* 音乐播放器浮动按钮 */
+.music-toggle-btn {
+    position: fixed; bottom: 20px; right: 20px;
+    width: 48px; height: 48px; border-radius: 50%;
+    background: rgba(20, 20, 30, 0.92); backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #fff; font-size: 1.4rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 100; transition: all 0.3s;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+.music-toggle-btn:hover {
+    background: rgba(0,212,170,0.2); border-color: #00d4aa;
+    transform: scale(1.1);
+}
+
 /* ========== 设置弹窗 ========== */
 .dialog-overlay {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;

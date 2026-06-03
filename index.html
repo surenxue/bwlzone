@@ -166,7 +166,7 @@
         </div>
 
         <!-- 音乐播放器栏 -->
-        <div class="music-bar" v-if="!isloading && musicinfo && musicinfo.length">
+        <div class="music-bar" v-if="!isloading && musicinfo && musicinfo.length && showMusicPlayer">
             <div class="music-controls">
                 <button @click="previousTrack" :disabled="audioLoading"><i class="mdi mdi-skip-previous"></i></button>
                 <button @click="togglePlay" :disabled="audioLoading">
@@ -174,16 +174,16 @@
                 </button>
                 <button @click="nextTrack" :disabled="audioLoading"><i class="mdi mdi-skip-next"></i></button>
             </div>
-            <div class="music-info" @click="showMusicPlayer = !showMusicPlayer">
+            <div class="music-info" @click="showMusicPlayer = false">
                 <span class="music-title">{{ musicinfo[playlistIndex]?.title }}</span>
                 <span class="music-author"> - {{ musicinfo[playlistIndex]?.author }}</span>
-                <i class="mdi" :class="showMusicPlayer ? 'mdi-chevron-down' : 'mdi-chevron-up'"></i>
+                <i class="mdi mdi-chevron-down"></i>
             </div>
             <audio ref="audioPlayer" :src="musicinfo[playlistIndex]?.url" @ended="nextTrack"
                    @waiting="audioLoading = true" @canplay="audioLoading = false"></audio>
 
             <!-- 播放列表 -->
-            <div class="playlist-dropdown" v-if="showMusicPlayer">
+            <div class="playlist-dropdown">
                 <div v-for="(song, idx) in musicinfo" :key="idx"
                      class="playlist-item" :class="{ active: idx === playlistIndex }"
                      @click="updateCurrentIndex(idx)">
@@ -193,6 +193,11 @@
                 </div>
             </div>
         </div>
+
+        <!-- 音乐播放器按钮 -->
+        <button class="music-toggle-btn" v-if="!isloading && musicinfo && musicinfo.length && !showMusicPlayer" @click="showMusicPlayer = true">
+            <i :class="isPlaying ? 'mdi mdi-music' : 'mdi mdi-music-off'"></i>
+        </button>
 
         <!-- 设置弹窗 -->
         <div class="dialog-overlay" v-if="dialog1" @click.self="dialog1 = false">
