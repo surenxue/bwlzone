@@ -222,13 +222,17 @@ const app = createApp({
             this.musicinfoLoading = true;
             try {
                 const { server, type, id } = this.configdata.musicPlayer;
-                const resp = await fetch(`https://api.i-meto.com/meting/api?server=${server}&type=${type}&id=${id}`);
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 8000);
+                const resp = await fetch(`https://api.i-meto.com/meting/api?server=${server}&type=${type}&id=${id}`, { signal: controller.signal });
+                clearTimeout(timeout);
                 if (!resp.ok) throw new Error('网络请求失败');
                 this.musicinfo = await resp.json();
                 this.musicinfoLoading = false;
             } catch (err) {
                 console.error('音乐请求失败:', err);
                 this.musicinfoLoading = false;
+                this.musicinfo = []; // 设为空数组防止页面卡住
             }
         },
         // QQ音乐切换
