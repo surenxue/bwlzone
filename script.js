@@ -46,6 +46,17 @@ const app = createApp({
             selectedWallpaperIdx: -1,
             tab: 'tab-1',
 
+            // 本地上传壁纸
+            uploadedWallpapers: {
+                pic: [],
+                picMobile: [],
+                video: [],
+                videoMobile: []
+            },
+            uploadPreviewSrc: '',
+            uploadWallpaperName: '',
+            uploadWallpaperFile: null,
+
             // 技术栈图标
             stackicons: [
                 { icon: 'mdi mdi-vuejs', color: '#4FC08D', tip: 'vue' },
@@ -73,11 +84,20 @@ const app = createApp({
             const device = this.wallpaperDevice;
             const type = this.wallpaperType;
             const wallpapers = this.configdata.wallpaper;
+            // 获取预设壁纸
+            let presetList = [];
             if (device === 'pc') {
-                return type === 'pic' ? (wallpapers.pic || []) : (wallpapers.video || []);
+                presetList = type === 'pic' ? (wallpapers.pic || []) : (wallpapers.video || []);
             } else {
-                return type === 'pic' ? (wallpapers.picMobile || []) : (wallpapers.videoMobile || []);
+                presetList = type === 'pic' ? (wallpapers.picMobile || []) : (wallpapers.videoMobile || []);
             }
+            // 获取上传壁纸
+            const uploadKey = device === 'pc'
+                ? (type === 'pic' ? 'pic' : 'video')
+                : (type === 'pic' ? 'picMobile' : 'videoMobile');
+            const uploadList = (this.uploadedWallpapers[uploadKey] || []).map(wp => ({ ...wp, isUpload: true }));
+            // 合并：预设在前，上传在后
+            return [...presetList.map(wp => ({ ...wp, isUpload: false })), ...uploadList];
         }
     },
     watch: {
@@ -269,13 +289,82 @@ const app = createApp({
                     }
                 }
             }
-            // 保存到 cookie/localStorage
+            // 保存到 localStorage
             const bgData = {
                 pc: { type: this.wallpaperDevice === 'pc' ? this.wallpaperType : 'pic', datainfo: this.wallpaperDevice === 'pc' && this.selectedWallpaperIdx >= 0 ? this.currentWallpaperList[this.selectedWallpaperIdx] : null },
                 mobile: { type: this.wallpaperDevice === 'mobile' ? this.wallpaperType : 'pic', datainfo: this.wallpaperDevice === 'mobile' && this.selectedWallpaperIdx >= 0 ? this.currentWallpaperList[this.selectedWallpaperIdx] : null }
             };
             localStorage.setItem('bwldatabackground', JSON.stringify(bgData));
             this.dialog1 = false;
+        },
+
+        // ========== 壁纸本地上传 ==========
+        onWallpaperFileChange(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            this.uploadWallpaperFile = file;
+            this.uploadWallpaperName = file.name.replace(/\.[^/.]+$/, '');
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                this.uploadPreviewSrc = event.target.result;
+            };
+            if (this.wallpaperType === 'pic') {
+                reader.readAsDataURL(file);
+            } else {
+                reader.readAsDataURL(file);
+            }
+        },
+        addUploadedWallpaper() {
+            if (!this.uploadPreviewSrc) return;
+            const name = this.uploadWallpaperName.trim() || '未命名';
+            const key = this.wallpaperDevice === 'pc'
+                ? (this.wallpaperType === 'pic' ? 'pic' : 'video')
+                : (this.wallpaperType === 'pic' ? 'picMobile' : 'videoMobile');
+            this.uploadedWallpapers[key].push({
+                name: name,
+                url: this.uploadPreviewSrc,
+                pre: this.wallpaperType === 'pic' ? this.uploadPreviewSrc : null
+            });
+            // 保存到 localStorage
+            this.saveUploadedWallpapers();
+            // 清理预览
+            this.uploadPreviewSrc = '';
+            this.uploadWallpaperName = '';
+            this.uploadWallpaperFile = null;
+            if (this.$refs.wallpaperFileInput) this.$refs.wallpaperFileInput.value = '';
+            // 自动选中新上传的壁纸
+            this.$nextTick(() => {
+                this.selectedWallpaperIdx = this.currentWallpaperList.length - 1;
+            });
+        },
+        removeUploadedWallpaper(idx) {
+            if (!confirm('确定删除这个壁纸吗？')) return;
+            const key = this.wallpaperDevice === 'pc'
+                ? (this.wallpaperType === 'pic' ? 'pic' : 'video')
+                : (this.wallpaperType === 'pic' ? 'picMobile' : 'videoMobile');
+            const presetCount = this.getPresetWallpaperCount();
+            const uploadIdx = idx - presetCount;
+            if (uploadIdx >= 0 && uploadIdx < this.uploadedWallpapers[key].length) {
+                this.uploadedWallpapers[key].splice(uploadIdx, 1);
+                this.saveUploadedWallpapers();
+                if (this.selectedWallpaperIdx === idx) {
+                    this.selectedWallpaperIdx = -1;
+                }
+            }
+        },
+        getPresetWallpaperCount() {
+            const wallpapers = this.configdata.wallpaper;
+            if (!wallpapers) return 0;
+            const device = this.wallpaperDevice;
+            const type = this.wallpaperType;
+            if (device === 'pc') {
+                return (type === 'pic' ? (wallpapers.pic || []) : (wallpapers.video || [])).length;
+            } else {
+                return (type === 'pic' ? (wallpapers.picMobile || []) : (wallpapers.videoMobile || [])).length;
+            }
+        },
+        saveUploadedWallpapers() {
+            localStorage.setItem('bwl_uploaded_wallpapers', JSON.stringify(this.uploadedWallpapers));
         },
 
         // ========== 跳转 ==========
@@ -509,6 +598,12 @@ const app = createApp({
             if (savedAvatar) {
                 this.avatarSrc = savedAvatar;
                 this.updateFavicon(savedAvatar);
+            }
+
+            // 恢复上传的壁纸
+            const savedUploadedWp = JSON.parse(localStorage.getItem('bwl_uploaded_wallpapers') || 'null');
+            if (savedUploadedWp) {
+                this.uploadedWallpapers = savedUploadedWp;
             }
 
             // 设置背景

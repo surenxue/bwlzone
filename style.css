@@ -387,6 +387,50 @@ a { text-decoration: none; color: inherit; }
     background: rgba(0,0,0,0.3);
 }
 .wallpaper-tip { color: rgba(255,255,255,0.4); font-size: 0.8rem; margin: 8px 0; }
+.wallpaper-video-placeholder {
+    width: 100%; height: 80px;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.3);
+}
+.wallpaper-video-placeholder i { font-size: 28px; color: rgba(255,255,255,0.4); }
+
+/* 壁纸本地上传 */
+.wallpaper-upload-area { margin-bottom: 10px; }
+.wallpaper-upload-preview {
+    width: 100%; height: 100px;
+    border: 2px dashed rgba(255,255,255,0.15);
+    border-radius: 8px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden; transition: all 0.3s; margin-bottom: 8px;
+}
+.wallpaper-upload-preview:hover { border-color: #00d4aa; background: rgba(0,212,170,0.05); }
+.upload-preview-img {
+    width: 100%; height: 100%; object-fit: cover;
+}
+.upload-placeholder {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    color: rgba(255,255,255,0.4);
+}
+.upload-placeholder i { font-size: 28px; }
+.upload-placeholder span { font-size: 0.8rem; }
+.upload-name-row {
+    display: flex; gap: 6px; align-items: center;
+}
+.upload-name-row .edit-input-sm { flex: 1; }
+
+/* 上传壁纸删除按钮 */
+.wallpaper-item { position: relative; }
+.wallpaper-del-btn {
+    position: absolute; top: 4px; right: 4px;
+    width: 20px; height: 20px; border-radius: 50%;
+    border: none; background: rgba(255,80,80,0.7); color: #fff;
+    cursor: pointer; font-size: 10px;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transition: opacity 0.3s;
+    z-index: 1;
+}
+.wallpaper-item:hover .wallpaper-del-btn { opacity: 1; }
+.wallpaper-del-btn:hover { background: #ff5050; }
 .music-status { color: rgba(255,255,255,0.6); padding: 16px 0; }
 
 .dialog-actions {

@@ -252,15 +252,43 @@
                                 <option value="video">动态壁纸</option>
                             </select>
                         </div>
-                        <div class="wallpaper-grid">
+
+                        <!-- 本地上传区域 -->
+                        <div class="edit-section">
+                            <h4 class="edit-section-title">本地上传</h4>
+                            <div class="wallpaper-upload-area">
+                                <div class="wallpaper-upload-preview" @click="$refs.wallpaperFileInput.click()">
+                                    <img v-if="uploadPreviewSrc" :src="uploadPreviewSrc" class="upload-preview-img">
+                                    <div v-else class="upload-placeholder">
+                                        <i class="mdi" :class="wallpaperType === 'pic' ? 'mdi-image-plus' : 'mdi-video-plus'"></i>
+                                        <span>点击选择{{ wallpaperType === 'pic' ? '图片' : '视频' }}文件</span>
+                                    </div>
+                                </div>
+                                <input type="file" ref="wallpaperFileInput"
+                                       :accept="wallpaperType === 'pic' ? 'image/*' : 'video/*'"
+                                       style="display:none" @change="onWallpaperFileChange">
+                                <div class="upload-name-row" v-if="uploadPreviewSrc">
+                                    <input type="text" v-model="uploadWallpaperName" placeholder="输入壁纸名称" class="edit-input edit-input-sm">
+                                    <button class="edit-btn-add" @click="addUploadedWallpaper">添加到列表</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 壁纸选择网格 -->
+                        <div class="wallpaper-grid" v-if="currentWallpaperList.length">
                             <div v-for="(wp, idx) in currentWallpaperList" :key="idx"
                                  class="wallpaper-item"
                                  :class="{ selected: selectedWallpaperIdx === idx }"
                                  @click="selectWallpaper(idx)">
                                 <img v-if="wp.pre" :src="wp.pre" :alt="wp.name">
+                                <div v-else class="wallpaper-video-placeholder">
+                                    <i class="mdi mdi-video"></i>
+                                </div>
                                 <span class="wp-name">{{ wp.name }}</span>
+                                <button v-if="wp.isUpload" class="wallpaper-del-btn" @click.stop="removeUploadedWallpaper(idx)" title="删除">✕</button>
                             </div>
                         </div>
+                        <p v-else class="wallpaper-tip">暂无壁纸，请上传或切换分类</p>
                         <p class="wallpaper-tip">不同壁纸在相应设备下响应</p>
                         <div class="dialog-actions">
                             <button @click="resetWallpaper">恢复默认</button>
