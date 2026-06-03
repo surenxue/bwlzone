@@ -458,15 +458,47 @@ const app = createApp({
         toggleAutoSync() {
             localStorage.setItem('bwl_auto_sync', this.autoSync ? '1' : '0');
         },
+        getSupabaseClient() {
+            if (window.supabaseClient) return window.supabaseClient;
+            const SUPABASE_URL = 'https://ydknekfvxbhmikyijrub.supabase.co';
+            const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlka25la2Z2eGJobWlreWlqcnViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0ODczNDQsImV4cCI6MjA5NjA2MzM0NH0.ZUeVuhl1b1a_C9I5XaplOIfVxkZDdkM9qfHSylc9Kcw';
+            if (window.supabase && window.supabase.createClient) {
+                window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            }
+            return window.supabaseClient;
+        },
+        async supabaseSave(key, data) {
+            const client = this.getSupabaseClient();
+            if (!client) return { ok: false, msg: 'Supabase SDK 未加载' };
+            try {
+                const { data: existing } = await client.from('settings').select('id').eq('key', key).single();
+                if (existing) {
+                    await client.from('settings').update({ data: data, updated_at: new Date().toISOString() }).eq('key', key);
+                } else {
+                    await client.from('settings').insert({ key: key, data: data });
+                }
+                return { ok: true };
+            } catch (err) {
+                return { ok: false, msg: err.message };
+            }
+        },
+        async supabaseLoad(key) {
+            const client = this.getSupabaseClient();
+            if (!client) return { ok: false, msg: 'Supabase SDK 未加载' };
+            try {
+                const { data, error } = await client.from('settings').select('data').eq('key', key).single();
+                if (error) return { ok: false, msg: error.message };
+                if (!data) return { ok: false, msg: '未找到数据' };
+                return { ok: true, data: data.data };
+            } catch (err) {
+                return { ok: false, msg: err.message };
+            }
+        },
         autoSyncToServer() {
             if (!this.syncKey || !this.autoSync || this.syncing) return;
             this.syncing = true;
             const data = this.getAllSettingsData();
-            fetch('/api/save', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ key: this.syncKey, data })
-            }).then(r => r.json()).then(res => {
+            this.supabaseSave(this.syncKey, data).then(res => {
                 this.syncStatus = res.ok ? '自动同步成功' : '';
                 this.syncOk = !!res.ok;
             }).catch(() => {
@@ -482,16 +514,11 @@ const app = createApp({
             this.syncStatus = '';
             const data = this.getAllSettingsData();
             try {
-                const resp = await fetch('/api/save', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ key: this.syncKey, data })
-                });
-                const result = await resp.json();
+                const result = await this.supabaseSave(this.syncKey, data);
                 this.syncStatus = result.ok ? '保存成功！可在其他电脑用相同同步码加载' : (result.msg || '保存失败');
                 this.syncOk = !!result.ok;
             } catch (err) {
-                this.syncStatus = '无法连接服务器，请确认 server.js 已启动（node server.js）';
+                this.syncStatus = '同步失败: ' + err.message;
                 this.syncOk = false;
             }
             this.syncing = false;
@@ -501,12 +528,7 @@ const app = createApp({
             this.syncing = true;
             this.syncStatus = '';
             try {
-                const resp = await fetch('/api/load', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ key: this.syncKey })
-                });
-                const result = await resp.json();
+                const result = await this.supabaseLoad(this.syncKey);
                 if (result.ok && result.data) {
                     const count = this.applySyncData(result.data);
                     this.syncStatus = `加载成功！已恢复 ${count || 0} 项数据，刷新页面生效`;
@@ -516,7 +538,7 @@ const app = createApp({
                     this.syncOk = false;
                 }
             } catch (err) {
-                this.syncStatus = '无法连接服务器，请确认 server.js 已启动（node server.js）';
+                this.syncStatus = '同步失败: ' + err.message;
                 this.syncOk = false;
             }
             this.syncing = false;
