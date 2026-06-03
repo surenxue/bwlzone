@@ -56,6 +56,14 @@ const app = createApp({
             uploadPreviewSrc: '',
             uploadWallpaperName: '',
             uploadWallpaperFile: null,
+            importStatus: '',
+
+            // 云端同步
+            syncKey: '',
+            syncing: false,
+            syncStatus: '',
+            syncOk: true,
+            autoSync: false,
 
             // 技术栈图标
             stackicons: [
@@ -151,6 +159,7 @@ const app = createApp({
                 this.avatarSrc = event.target.result;
                 localStorage.setItem('bwl_avatar', event.target.result);
                 this.updateFavicon(event.target.result);
+                this.autoSyncToServer();
             };
             reader.readAsDataURL(file);
         },
@@ -296,6 +305,7 @@ const app = createApp({
             };
             localStorage.setItem('bwldatabackground', JSON.stringify(bgData));
             this.dialog1 = false;
+            this.autoSyncToServer();
         },
 
         // ========== 壁纸本地上传 ==========
@@ -327,6 +337,7 @@ const app = createApp({
             });
             // 保存到 localStorage
             this.saveUploadedWallpapers();
+            this.autoSyncToServer();
             // 清理预览
             this.uploadPreviewSrc = '';
             this.uploadWallpaperName = '';
@@ -365,6 +376,150 @@ const app = createApp({
         },
         saveUploadedWallpapers() {
             localStorage.setItem('bwl_uploaded_wallpapers', JSON.stringify(this.uploadedWallpapers));
+        },
+
+        // ========== 数据导出/导入 ==========
+        exportSettings() {
+            const exportData = {
+                bwl_avatar: localStorage.getItem('bwl_avatar') || null,
+                bwl_content: JSON.parse(localStorage.getItem('bwl_content') || 'null'),
+                bwldata: JSON.parse(localStorage.getItem('bwldata') || 'null'),
+                bwldatabackground: JSON.parse(localStorage.getItem('bwldatabackground') || 'null'),
+                bwl_uploaded_wallpapers: JSON.parse(localStorage.getItem('bwl_uploaded_wallpapers') || 'null'),
+            };
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'bwlzone-settings-' + new Date().toISOString().slice(0, 10) + '.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        },
+        importSettings(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const data = JSON.parse(event.target.result);
+                    let count = 0;
+                    if (data.bwl_avatar) { localStorage.setItem('bwl_avatar', data.bwl_avatar); count++; }
+                    if (data.bwl_content) { localStorage.setItem('bwl_content', JSON.stringify(data.bwl_content)); count++; }
+                    if (data.bwldata) { localStorage.setItem('bwldata', JSON.stringify(data.bwldata)); count++; }
+                    if (data.bwldatabackground) { localStorage.setItem('bwldatabackground', JSON.stringify(data.bwldatabackground)); count++; }
+                    if (data.bwl_uploaded_wallpapers) { localStorage.setItem('bwl_uploaded_wallpapers', JSON.stringify(data.bwl_uploaded_wallpapers)); count++; }
+                    this.importStatus = `已导入 ${count} 项数据，刷新页面生效`;
+                    if (this.$refs.importFileInput) this.$refs.importFileInput.value = '';
+                } catch (err) {
+                    this.importStatus = '文件格式错误，请选择正确的 .json 文件';
+                    console.error('导入失败:', err);
+                }
+            };
+            reader.readAsText(file);
+        },
+        clearAllData() {
+            if (!confirm('⚠️ 确定要清除所有本地数据吗？\n\n这将删除：头像、壁纸、内容设置、上传的壁纸等。\n清除后页面将恢复默认状态。')) return;
+            localStorage.removeItem('bwl_avatar');
+            localStorage.removeItem('bwl_content');
+            localStorage.removeItem('bwldata');
+            localStorage.removeItem('bwldatabackground');
+            localStorage.removeItem('bwl_uploaded_wallpapers');
+            this.importStatus = '已清除所有数据，刷新页面生效';
+        },
+
+        // ========== 云端同步 ==========
+        getAllSettingsData() {
+            return {
+                bwl_avatar: localStorage.getItem('bwl_avatar') || null,
+                bwl_content: JSON.parse(localStorage.getItem('bwl_content') || 'null'),
+                bwldatabackground: JSON.parse(localStorage.getItem('bwldatabackground') || 'null'),
+                bwl_uploaded_wallpapers: JSON.parse(localStorage.getItem('bwl_uploaded_wallpapers') || 'null'),
+            };
+        },
+        applySyncData(data) {
+            if (!data) return;
+            let count = 0;
+            if (data.bwl_avatar) { localStorage.setItem('bwl_avatar', data.bwl_avatar); count++; }
+            if (data.bwl_content) { localStorage.setItem('bwl_content', JSON.stringify(data.bwl_content)); count++; }
+            if (data.bwldatabackground) { localStorage.setItem('bwldatabackground', JSON.stringify(data.bwldatabackground)); count++; }
+            if (data.bwl_uploaded_wallpapers) { localStorage.setItem('bwl_uploaded_wallpapers', JSON.stringify(data.bwl_uploaded_wallpapers)); count++; }
+            return count;
+        },
+        generateSyncKey() {
+            const chars = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+            let key = '';
+            for (let i = 0; i < 8; i++) key += chars.charAt(Math.floor(Math.random() * chars.length));
+            this.syncKey = key;
+            this.saveSyncKey();
+        },
+        saveSyncKey() {
+            localStorage.setItem('bwl_sync_key', this.syncKey);
+        },
+        toggleAutoSync() {
+            localStorage.setItem('bwl_auto_sync', this.autoSync ? '1' : '0');
+        },
+        autoSyncToServer() {
+            if (!this.syncKey || !this.autoSync || this.syncing) return;
+            this.syncing = true;
+            const data = this.getAllSettingsData();
+            fetch('/api/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ key: this.syncKey, data })
+            }).then(r => r.json()).then(res => {
+                this.syncStatus = res.ok ? '自动同步成功' : '';
+                this.syncOk = !!res.ok;
+            }).catch(() => {
+                // 静默失败，不打扰用户
+            }).finally(() => {
+                this.syncing = false;
+                setTimeout(() => { if (this.syncStatus === '自动同步成功') this.syncStatus = ''; }, 3000);
+            });
+        },
+        async syncSaveToServer() {
+            if (!this.syncKey) return;
+            this.syncing = true;
+            this.syncStatus = '';
+            const data = this.getAllSettingsData();
+            try {
+                const resp = await fetch('/api/save', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ key: this.syncKey, data })
+                });
+                const result = await resp.json();
+                this.syncStatus = result.ok ? '保存成功！可在其他电脑用相同同步码加载' : (result.msg || '保存失败');
+                this.syncOk = !!result.ok;
+            } catch (err) {
+                this.syncStatus = '无法连接服务器，请确认 server.js 已启动（node server.js）';
+                this.syncOk = false;
+            }
+            this.syncing = false;
+        },
+        async syncLoadFromServer() {
+            if (!this.syncKey) return;
+            this.syncing = true;
+            this.syncStatus = '';
+            try {
+                const resp = await fetch('/api/load', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ key: this.syncKey })
+                });
+                const result = await resp.json();
+                if (result.ok && result.data) {
+                    const count = this.applySyncData(result.data);
+                    this.syncStatus = `加载成功！已恢复 ${count || 0} 项数据，刷新页面生效`;
+                    this.syncOk = true;
+                } else {
+                    this.syncStatus = result.msg || '加载失败';
+                    this.syncOk = false;
+                }
+            } catch (err) {
+                this.syncStatus = '无法连接服务器，请确认 server.js 已启动（node server.js）';
+                this.syncOk = false;
+            }
+            this.syncing = false;
         },
 
         // ========== 跳转 ==========
@@ -479,6 +634,7 @@ const app = createApp({
             };
             localStorage.setItem('bwl_content', JSON.stringify(toSave));
             this.dialog1 = false;
+            this.autoSyncToServer();
             // 刷新技能图
             this.$nextTick(() => {
                 this.renderPolarChart();
@@ -605,6 +761,11 @@ const app = createApp({
             if (savedUploadedWp) {
                 this.uploadedWallpapers = savedUploadedWp;
             }
+
+            // 恢复同步设置
+            const savedSyncKey = localStorage.getItem('bwl_sync_key');
+            if (savedSyncKey) this.syncKey = savedSyncKey;
+            this.autoSync = localStorage.getItem('bwl_auto_sync') === '1';
 
             // 设置背景
             this.setMainProperty();
