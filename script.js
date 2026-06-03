@@ -74,11 +74,10 @@ const app = createApp({
                 { icon: 'mdi mdi-vuetify', color: '#1697F6', tip: 'vuetify' },
             ],
 
-            // QQ音乐嵌入
+            // QQ音乐
             musicMode: 'netease', // 'netease' | 'qqmusic'
             qqMusicPlaylistId: '',
-            qqMusicEmbed: false,      // 是否使用官方嵌入播放器
-            qqEmbedMinimized: false,  // 嵌入播放器是否最小化
+            qqMusicEmbed: false,      // QQ音乐模式下是否使用官方页面播放（而非本站播放）
 
             // 打字机
             typewriterIndex: 0,
@@ -278,37 +277,19 @@ const app = createApp({
                 this.qqMusicPlaylistId = '';
             }
         },
-        onQQMusicEmbedChange() {
-            this.saveQQMusicSettings();
-            if (this.qqMusicEmbed) {
-                // 关闭自定义音乐播放器
-                this.showMusicPlayer = false;
-                this.isPlaying = false;
-                if (this.audioPlayer) {
-                    this.audioPlayer.pause();
-                }
-            }
-        },
-        applyQQEmbed() {
+        openQQMusicPlaylist() {
             if (!this.qqMusicPlaylistId) return;
-            this.qqEmbedMinimized = false;
-            this.showMusicPlayer = false;
-            this.isPlaying = false;
-            if (this.audioPlayer) {
-                this.audioPlayer.pause();
-            }
+            // 在新标签页打开QQ音乐官方歌单页面
+            const url = `https://y.qq.com/n/ryqq/playlist/${this.qqMusicPlaylistId}`;
+            window.open(url, '_blank').focus();
             this.saveQQMusicSettings();
             this.dialog1 = false;
-        },
-        toggleQQEmbedMinimize() {
-            this.qqEmbedMinimized = !this.qqEmbedMinimized;
         },
         saveQQMusicSettings() {
             localStorage.setItem('bwl_qqmusic', JSON.stringify({
                 musicMode: this.musicMode,
                 qqMusicPlaylistId: this.qqMusicPlaylistId,
-                qqMusicEmbed: this.qqMusicEmbed,
-                qqEmbedMinimized: this.qqEmbedMinimized
+                qqMusicEmbed: this.qqMusicEmbed
             }));
         },
         togglePlay() {
@@ -886,7 +867,6 @@ const app = createApp({
                 this.musicMode = savedQQMusic.musicMode || 'netease';
                 this.qqMusicPlaylistId = savedQQMusic.qqMusicPlaylistId || '';
                 this.qqMusicEmbed = savedQQMusic.qqMusicEmbed || false;
-                this.qqEmbedMinimized = savedQQMusic.qqEmbedMinimized || false;
             }
             // 确保默认有ID
             if (!this.qqMusicPlaylistId) {

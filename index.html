@@ -328,33 +328,37 @@
                             </div>
                         </div>
 
-                        <!-- QQ音乐嵌入播放器开关 -->
+                        <!-- QQ音乐模式说明 -->
                         <div class="setting-group" v-if="musicMode === 'qqmusic'">
-                            <label class="checkbox-label">
-                                <input type="checkbox" v-model="qqMusicEmbed" @change="onQQMusicEmbedChange">
-                                <span>使用官方嵌入播放器（支持VIP歌曲，需在QQ音乐登录）</span>
-                            </label>
-                            <small class="embed-tip">⚠️ 嵌入播放器需要先在浏览器中登录 y.qq.com 才能播放VIP歌曲。播放器将显示在页面右下角。</small>
+                            <small class="embed-tip">💡 QQ音乐模式下，VIP歌曲可能无法直接播放。你可以在下方打开QQ音乐官方页面，登录后即可畅听全部歌曲。</small>
                         </div>
 
-                        <!-- 非嵌入模式的状态 -->
+                        <div class="setting-group" v-if="musicMode === 'qqmusic'">
+                            <label>播放方式</label>
+                            <div class="mode-btns">
+                                <button class="mode-btn" :class="{ active: !qqMusicEmbed }" @click="qqMusicEmbed = false; saveQQMusicSettings()">本站播放</button>
+                                <button class="mode-btn" :class="{ active: qqMusicEmbed }" @click="qqMusicEmbed = true; saveQQMusicSettings()">官方页面播放</button>
+                            </div>
+                        </div>
+
+                        <!-- 本站播放模式 -->
                         <template v-if="!qqMusicEmbed || musicMode === 'netease'">
                             <p class="music-status" v-if="musicinfo && musicinfo.length">共 {{ musicinfo.length }} 首歌 | 当前播放：{{ musicinfo[playlistIndex]?.title }}</p>
                             <p class="music-status" v-else-if="musicinfoLoading">加载中...</p>
                             <p class="music-status" v-else>暂无歌曲，请输入歌单ID并点击"加载歌单"</p>
                         </template>
 
-                        <!-- 嵌入模式的提示 -->
+                        <!-- 官方页面播放模式 -->
                         <p class="music-status" v-else-if="qqMusicEmbed && qqMusicPlaylistId">
-                            官方播放器已启用 | 歌单ID: {{ qqMusicPlaylistId }}
+                            💿 官方页面播放模式 | 歌单ID: {{ qqMusicPlaylistId }}
                         </p>
                         <p class="music-status" v-else-if="qqMusicEmbed">
-                            请输入歌单ID以启用官方播放器
+                            请输入歌单ID，点击下方按钮跳转到QQ音乐播放
                         </p>
 
                         <div class="dialog-actions">
                             <button v-if="!qqMusicEmbed || musicMode === 'netease'" class="primary" @click="loadPlaylist" :disabled="musicinfoLoading">{{ musicinfoLoading ? '加载中...' : '加载歌单' }}</button>
-                            <button v-if="qqMusicEmbed && musicMode === 'qqmusic'" class="primary" @click="applyQQEmbed">应用嵌入播放器</button>
+                            <button v-if="qqMusicEmbed && musicMode === 'qqmusic'" class="primary" @click="openQQMusicPlaylist">🎵 在QQ音乐中播放</button>
                             <button @click="dialog1 = false">关闭</button>
                         </div>
                     </div>
@@ -523,25 +527,12 @@
             </div>
         </div>
 
-        <!-- QQ音乐嵌入播放器 -->
-        <div class="qq-embed-player" v-if="!isloading && qqMusicEmbed && qqMusicPlaylistId && musicMode === 'qqmusic'">
-            <div class="qq-embed-header">
-                <span class="qq-embed-title">QQ音乐播放器</span>
-                <button class="qq-embed-close" @click="toggleQQEmbedMinimize">
-                    <i :class="qqEmbedMinimized ? 'mdi mdi-chevron-up' : 'mdi mdi-chevron-down'"></i>
-                </button>
-            </div>
-            <div class="qq-embed-body" v-show="!qqEmbedMinimized">
-                <iframe 
-                    :src="qqEmbedUrl"
-                    frameborder="0" 
-                    width="100%" 
-                    height="460"
-                    allow="autoplay"
-                    allowfullscreen>
-                </iframe>
-            </div>
-        </div>
+        <!-- QQ音乐官方页面快捷按钮 -->
+        <a class="qq-open-btn" v-if="!isloading && qqMusicEmbed && qqMusicPlaylistId && musicMode === 'qqmusic'"
+           :href="qqEmbedUrl" target="_blank" rel="noopener" title="在QQ音乐中打开歌单">
+            <i class="mdi mdi-music-circle"></i>
+            <span>QQ音乐</span>
+        </a>
 
         <!-- 页脚 -->
         <footer class="site-footer" v-if="!isloading && (configdata.statement?.icp || configdata.statement?.copyright)">
