@@ -2,172 +2,386 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8" />
+    <link rel="icon" type="image/x-icon" href="img/avatar.jpg">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="欢迎来到Leleo的奇妙世界！">
+    <meta name="keywords" content="Leleo,leleo,个人主页,个人网站">
     <title>Leleo的个人主页🎉</title>
-    <meta name="description" content="欢迎来到Leleo的奇妙世界！" />
-    <meta name="keywords" content="Leleo, leleo, 个人主页, 个人网站" />
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css" />
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@3.5.17/dist/vuetify.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/vue@3.4.27/dist/vue.global.prod.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@3.5.17/dist/vuetify.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 </head>
 <body>
-    <!-- 加载动画 -->
-    <div class="loading" id="loadingScreen">
-        <div class="spinner"></div>
-    </div>
+    <div id="app">
+        <!-- 加载动画 -->
+        <div class="loading" v-if="isloading">
+            <div class="spinner"></div>
+        </div>
 
-    <!-- 全屏背景 -->
-    <div class="fullscreen-bg" id="fullscreenBg">
-        <div class="bg-overlay"></div>
-        <video class="video-bg" id="videoBg" loop muted playsinline style="display:none;"></video>
-    </div>
+        <!-- 全屏背景 -->
+        <div class="vapp-fullscreen-background">
+            <!-- 视频背景 -->
+            <video v-if="videosrc" ref="VdPlayer" class="video-bg" :src="videosrc" autoplay loop muted playsinline></video>
 
-    <!-- 主内容 -->
-    <div class="main-content" id="mainContent" style="visibility:hidden;">
-        <div class="app-container">
-            <!-- 左侧面板 -->
-            <div class="left-panel">
-                <!-- 欢迎语 -->
-                <div class="welcome-text" id="welcomeText">Hi, I'm Leleo</div>
-
-                <!-- 头像区域 -->
-                <div class="avatar-section">
-                    <div class="avatar-wrapper" id="avatarWrapper">
-                        <img src="img/avatar.jpg" alt="头像" class="avatar-img" id="avatarImg" />
-                        <div class="turntable" id="turntable" style="display:none;">
-                            <svg viewBox="0 0 200 200" width="200" height="200">
-                                <defs>
-                                    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-                                        <stop offset="0%" style="stop-color:#FFFF00;stop-opacity:1" />
-                                        <stop offset="100%" style="stop-color:#00FFFF;stop-opacity:1" />
-                                    </linearGradient>
-                                </defs>
-                                <circle cx="100" cy="100" r="95" fill="none" stroke="url(#grad1)" stroke-width="3" stroke-dasharray="8 6"/>
-                                <circle cx="100" cy="100" r="80" fill="none" stroke="url(#grad1)" stroke-width="1.5" stroke-dasharray="4 8"/>
-                                <circle cx="100" cy="100" r="65" fill="none" stroke="url(#grad1)" stroke-width="1" stroke-dasharray="2 6"/>
-                                <circle cx="100" cy="100" r="30" fill="url(#grad1)" opacity="0.3"/>
-                                <circle cx="100" cy="100" r="8" fill="url(#grad1)"/>
-                            </svg>
-                        </div>
-                        <div class="music-player" id="musicPlayer" style="display:none;">
-                            <div class="music-info" id="musicInfo">
-                                <span class="music-title" id="musicTitle"></span>
-                                <span class="music-author" id="musicAuthor"></span>
-                            </div>
-                            <div class="music-controls">
-                                <button class="music-btn" id="prevBtn"><i class="mdi mdi-skip-previous"></i></button>
-                                <button class="music-btn" id="playBtn"><i class="mdi mdi-play"></i></button>
-                                <button class="music-btn" id="nextBtn"><i class="mdi mdi-skip-next"></i></button>
-                            </div>
-                            <div class="music-progress">
-                                <input type="range" id="musicProgress" min="0" max="100" value="0" />
-                            </div>
-                        </div>
+            <!-- 设置浮动按钮 -->
+            <div class="floating-switch-container" v-if="!isloading">
+                <div class="floating-switch" :class="{ expanded: isExpanded }">
+                    <div class="switch-inner">
+                        <button class="switch-btn" @click="dialog1 = true" v-if="!isExpanded">
+                            <i class="mdi mdi-cog"></i>
+                        </button>
+                        <template v-if="isExpanded">
+                            <button class="switch-btn" @click="tab = 'tab-1'" :class="{ active: tab === 'tab-1' }">
+                                <i class="mdi mdi-pencil-plus"></i>
+                            </button>
+                            <button class="switch-btn" @click="tab = 'tab-2'" :class="{ active: tab === 'tab-2' }">
+                                <i class="mdi mdi-wallpaper"></i>
+                            </button>
+                            <button class="switch-btn" @click="tab = 'tab-3'" :class="{ active: tab === 'tab-3' }">
+                                <i class="mdi mdi-music-circle-outline"></i>
+                            </button>
+                            <button class="switch-btn" @click="isExpanded = false">
+                                <i class="mdi mdi-close"></i>
+                            </button>
+                        </template>
                     </div>
-                </div>
-
-                <!-- 标签 -->
-                <div class="tags-section" id="tagsSection">
-                    <span class="tag" v-for="tag in tags">乐观开朗</span>
-                </div>
-
-                <!-- 社交图标 -->
-                <div class="social-icons" id="socialIcons">
-                    <a href="https://www.github.com/leleo886" target="_blank" class="social-icon" title="GitHub">
-                        <i class="mdi mdi-github"></i>
-                    </a>
-                    <a href="mailto:leleo886@foxmail.com" class="social-icon" title="邮箱">
-                        <i class="mdi mdi-email"></i>
-                    </a>
-                    <a href="#" class="social-icon" title="QQ">
-                        <i class="mdi mdi-qqchat"></i>
-                    </a>
-                    <a href="#" class="social-icon" title="微信">
-                        <i class="mdi mdi-wechat"></i>
-                    </a>
                 </div>
             </div>
 
-            <!-- 右侧面板 -->
-            <div class="right-panel" id="rightPanel">
-                <!-- 搜索引擎 -->
-                <div class="search-engine">
-                    <span class="engine-title">Leleo.top</span>
-                    <div class="search-box">
-                        <input type="text" placeholder="搜索..." id="searchInput" />
-                        <button id="searchBtn"><i class="mdi mdi-magnify"></i></button>
+            <!-- 主内容区 -->
+            <div class="main-container" v-if="!isloading">
+                <!-- 左侧区域 -->
+                <div class="leleo-left">
+                    <!-- 头像区域 -->
+                    <div class="leleo-left-avatar">
+                        <div class="avatar-wrapper" @click="$refs.avatarInput.click()">
+                            <input type="file" ref="avatarInput" accept="image/*" style="display:none" @change="onAvatarChange">
+                            <img :src="avatarSrc" class="avatar-img fade-in" alt="avatar">
+                            <!-- 音乐播放器转盘 -->
+                            <div class="musicplayer" v-if="ismusicplayer && musicinfo && musicinfo.length">
+                                <div class="musicplayer-text">{{ musicinfo[playlistIndex]?.title }} - {{ musicinfo[playlistIndex]?.author }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 欢迎标题 -->
+                    <div class="leleo-left-welcome">
+                        <h2 class="welcome-title">{{ configdata.welcometitle }}</h2>
+                        <div class="typewriter-container">
+                            <span class="typewriter-text">{{ currentTypewriterText }}</span>
+                            <span class="typewriter-cursor">|</span>
+                        </div>
+                    </div>
+
+                    <!-- 社交图标 -->
+                    <div class="leleo-left-socialIconsContainer">
+                        <div class="social-icons">
+                            <a v-for="(link, name) in configdata.socialPlatformIcons" :key="name"
+                               :href="link" target="_blank" class="leleo-social-bticon" :title="name">
+                                <i :class="getSocialIcon(name)"></i>
+                            </a>
+                        </div>
                     </div>
                 </div>
 
-                <!-- 时间日期 -->
-                <div class="datetime-display">
-                    <div class="time-display clock-font" id="timeDisplay">14 : 30 : 05</div>
-                    <div class="date-display" id="dateDisplay">2025年01月15日 星期三</div>
-                </div>
-
-                <!-- 部署按钮 -->
-                <div class="deploy-section">
-                    <button class="deploy-btn" id="deployBtn">
-                        <i class="mdi mdi-rocket-launch"></i> 部署项目
-                    </button>
-                </div>
-
-                <!-- 标签页切换 -->
-                <div class="tabs-nav" id="tabsNav">
-                    <button class="tab-btn active" data-tab="tab1">
-                        <i class="mdi mdi-pencil-plus"></i> 样式预览
-                    </button>
-                    <button class="tab-btn" data-tab="tab2">
-                        <i class="mdi mdi-wallpaper"></i> 背景预览
-                    </button>
-                    <button class="tab-btn" data-tab="tab3">
-                        <i class="mdi mdi-music-circle-outline"></i> 音乐播放
-                    </button>
-                </div>
-
-                <!-- Tab1: 样式预览 - 技能雷达图 -->
-                <div class="tab-content active" id="tab1">
-                    <h3 class="tab-title">技能雷达图</h3>
-                    <div class="chart-container">
-                        <canvas id="polarChart"></canvas>
+                <!-- 右侧区域 -->
+                <div class="leleo-right">
+                    <!-- 搜索引擎 + 时钟 -->
+                    <div class="right-top-row">
+                        <div class="search-engine-selector">
+                            <select v-model="selectedEngine" class="engine-select">
+                                <option v-for="eng in searchEngines" :key="eng.title" :value="eng">
+                                    {{ eng.title }}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="search-form">
+                            <form @submit.prevent="doSearch">
+                                <input type="text" v-model="searchQuery" :placeholder="'在 ' + selectedEngine.title + ' 中搜索...'" class="search-input">
+                                <button type="submit" class="search-btn">
+                                    <i class="mdi mdi-magnify"></i>
+                                </button>
+                            </form>
+                        </div>
+                        <div class="clock-display">
+                            <div class="clock-font clock-time">{{ formattedTime }}</div>
+                            <div class="clock-font clock-date">{{ formattedDate }}</div>
+                        </div>
                     </div>
-                </div>
 
-                <!-- Tab2: 背景预览 -->
-                <div class="tab-content" id="tab2">
-                    <h3 class="tab-title">壁纸切换</h3>
-                    <div class="wallpaper-grid" id="wallpaperGrid"></div>
-                    <p class="tab-hint">不同壁纸在相应设备下响应</p>
-                </div>
+                    <!-- 标签 -->
+                    <div class="tags-section" v-if="configdata.tags && configdata.tags.length">
+                        <h3 class="section-label">Tags</h3>
+                        <div class="tags-container">
+                            <span v-for="tag in configdata.tags" :key="tag" class="tag-item">{{ tag }}</span>
+                        </div>
+                    </div>
 
-                <!-- Tab3: 音乐播放器 -->
-                <div class="tab-content" id="tab3">
-                    <h3 class="tab-title">播放列表</h3>
-                    <div class="playlist" id="playlist"></div>
-                    <div class="lyrics-display" id="lyricsDisplay" style="display:none;">
-                        <p id="currentLyric"></p>
+                    <!-- 极坐标技能图 -->
+                    <div class="polar-section" v-if="configdata.polarChart">
+                        <h3 class="section-label">技能雷达</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="polarChart" ref="polarChartRef"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- 项目卡片 -->
+                    <div class="projects-section" v-if="configdata.projectcards && configdata.projectcards.length">
+                        <h3 class="section-label">项目</h3>
+                        <div class="project-cards">
+                            <div v-for="(project, idx) in configdata.projectcards" :key="idx"
+                                 class="project-card" @click="jump(project.link)" :class="{ show: project.show !== false }">
+                                <img :src="project.img" :alt="project.title" class="project-card-img">
+                                <div class="project-card-info">
+                                    <h4>{{ project.title }}</h4>
+                                    <p>{{ project.subtitle }}</p>
+                                    <small>{{ project.text }}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 关于 -->
+                    <div class="about-section">
+                        <h3 class="section-label">关于本站</h3>
+                        <div class="stack-icons">
+                            <div v-for="item in stackicons" :key="item.tip" class="stack-icon-item" :title="item.tip">
+                                <i :class="item.icon" :style="{ color: item.color }"></i>
+                                <span>{{ item.tip }}</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- 项目卡片 -->
-        <div class="projects-section" id="projectsSection">
-            <h2 class="section-title">项目作品</h2>
-            <div class="projects-grid" id="projectsGrid"></div>
+        <!-- 音乐播放器栏 -->
+        <div class="music-bar" v-if="!isloading && musicinfo && musicinfo.length">
+            <div class="music-controls">
+                <button @click="previousTrack" :disabled="audioLoading"><i class="mdi mdi-skip-previous"></i></button>
+                <button @click="togglePlay" :disabled="audioLoading">
+                    <i :class="isPlaying ? 'mdi mdi-pause' : 'mdi mdi-play'"></i>
+                </button>
+                <button @click="nextTrack" :disabled="audioLoading"><i class="mdi mdi-skip-next"></i></button>
+            </div>
+            <div class="music-info" @click="showMusicPlayer = !showMusicPlayer">
+                <span class="music-title">{{ musicinfo[playlistIndex]?.title }}</span>
+                <span class="music-author"> - {{ musicinfo[playlistIndex]?.author }}</span>
+                <i class="mdi" :class="showMusicPlayer ? 'mdi-chevron-down' : 'mdi-chevron-up'"></i>
+            </div>
+            <audio ref="audioPlayer" :src="musicinfo[playlistIndex]?.url" @ended="nextTrack"
+                   @waiting="audioLoading = true" @canplay="audioLoading = false"></audio>
+
+            <!-- 播放列表 -->
+            <div class="playlist-dropdown" v-if="showMusicPlayer">
+                <div v-for="(song, idx) in musicinfo" :key="idx"
+                     class="playlist-item" :class="{ active: idx === playlistIndex }"
+                     @click="updateCurrentIndex(idx)">
+                    <span class="pl-index">{{ idx + 1 }}</span>
+                    <span class="pl-title">{{ song.title }}</span>
+                    <span class="pl-author">{{ song.author }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 设置弹窗 -->
+        <div class="dialog-overlay" v-if="dialog1" @click.self="dialog1 = false">
+            <div class="dialog-content">
+                <h3>设置</h3>
+                <div class="dialog-body">
+                    <!-- 标签切换 -->
+                    <div class="dialog-tabs">
+                        <button @click="tab = 'tab-1'" :class="{ active: tab === 'tab-1' }">
+                            <i class="mdi mdi-pencil-plus"></i> 样式
+                        </button>
+                        <button @click="tab = 'tab-2'" :class="{ active: tab === 'tab-2' }">
+                            <i class="mdi mdi-wallpaper"></i> 壁纸
+                        </button>
+                        <button @click="tab = 'tab-3'" :class="{ active: tab === 'tab-3' }">
+                            <i class="mdi mdi-music-circle-outline"></i> 音乐
+                        </button>
+                    </div>
+
+                    <!-- Tab 1: 样式设置 -->
+                    <div v-if="tab === 'tab-1'" class="tab-content">
+                        <div class="setting-group">
+                            <label>主题颜色</label>
+                            <input type="color" v-model="themeColor" @change="applyTheme">
+                        </div>
+                        <div class="setting-group">
+                            <label>标题颜色</label>
+                            <input type="color" v-model="titleColor" @change="applyTheme">
+                        </div>
+                        <div class="setting-group">
+                            <label>背景亮度 ({{ brightness }}%)</label>
+                            <input type="range" min="10" max="150" v-model.number="brightness" @input="applyTheme">
+                        </div>
+                        <div class="setting-group">
+                            <label>毛玻璃模糊 ({{ blur }}px)</label>
+                            <input type="range" min="0" max="30" v-model.number="blur" @input="applyTheme">
+                        </div>
+                        <div class="dialog-actions">
+                            <button @click="resetStyle">恢复默认</button>
+                            <button @click="dialog1 = false">取消</button>
+                            <button class="primary" @click="saveStyle">确认</button>
+                        </div>
+                    </div>
+
+                    <!-- Tab 2: 壁纸设置 -->
+                    <div v-if="tab === 'tab-2'" class="tab-content">
+                        <div class="setting-group">
+                            <label>设备类型</label>
+                            <select v-model="wallpaperDevice">
+                                <option value="pc">PC端</option>
+                                <option value="mobile">移动端</option>
+                            </select>
+                        </div>
+                        <div class="setting-group">
+                            <label>壁纸类型</label>
+                            <select v-model="wallpaperType">
+                                <option value="pic">静态壁纸</option>
+                                <option value="video">动态壁纸</option>
+                            </select>
+                        </div>
+                        <div class="wallpaper-grid">
+                            <div v-for="(wp, idx) in currentWallpaperList" :key="idx"
+                                 class="wallpaper-item"
+                                 :class="{ selected: selectedWallpaperIdx === idx }"
+                                 @click="selectWallpaper(idx)">
+                                <img v-if="wp.pre" :src="wp.pre" :alt="wp.name">
+                                <span class="wp-name">{{ wp.name }}</span>
+                            </div>
+                        </div>
+                        <p class="wallpaper-tip">不同壁纸在相应设备下响应</p>
+                        <div class="dialog-actions">
+                            <button @click="resetWallpaper">恢复默认</button>
+                            <button @click="dialog1 = false">取消</button>
+                            <button class="primary" @click="saveWallpaper">确认</button>
+                        </div>
+                    </div>
+
+                    <!-- Tab 3: 音乐播放 -->
+                    <div v-if="tab === 'tab-3'" class="tab-content">
+                        <p class="music-status">当前播放：{{ musicinfo && musicinfo.length ? musicinfo[playlistIndex]?.title : '加载中...' }}</p>
+                        <div class="dialog-actions">
+                            <button @click="dialog1 = false">关闭</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- 页脚 -->
-        <footer class="site-footer">
-            <p>备案号：XXICP备123456789号</p>
-            <p>Copyright © 2025 Leleo</p>
+        <footer class="site-footer" v-if="!isloading">
+            <p>{{ configdata.statement?.icp || 'XXICP备123456789号' }}</p>
+            <p>{{ configdata.statement?.copyright || 'Copyright © 2025 Leleo' }}</p>
         </footer>
     </div>
 
-    <!-- 隐藏的音频播放器 -->
-    <audio id="audioPlayer" preload="none"></audio>
+    <script>
+// ========== 配置文件 ==========
+const config = {
+    metaData: {
+        title: "Leleo的个人主页🎉",
+        description: "欢迎来到Leleo的奇妙世界！",
+        keywords: "Leleo,leleo,个人主页,个人网站",
+        icon: "/favicon.ico"
+    },
+    avatar: "img/avatar.jpg",
+    welcometitle: "Hi, I'm Leleo",
+    color: {
+        themecolor: "#FFFFFF",
+        welcometitlecolor: "#FFFFFF",
+        turntablecolor1: "#FFFF00",
+        turntablecolor2: "#00FFFF"
+    },
+    brightness: 85,
+    blur: 5,
+    tags: ["乐观开朗", "温柔体贴", "随和亲切", "冷静沉着", "才思敏捷", "风趣幽默", "刚正不阿", "善解人意"],
+    polarChart: {
+        skills: ["Vue.js", "React", "JavaScript", "Node", "Java", "Python", "Linux", "Docker", "MySQL", "MongoDB", "AWS"],
+        skillPoints: [85, 78, 88, 90, 80, 78, 85, 65, 82, 78, 70]
+    },
+    socialPlatformIcons: {
+        "GitHub": "https://www.github.com/leleo886",
+        "Email": "mailto:leleo886@foxmail.com",
+        "QQ": "https://im.qq.com/",
+        "WeChat": "https://wx.qq.com/",
+        "YouTube": "https://www.youtube.com",
+        "Facebook": "https://www.facebook.com"
+    },
+    typeWriterStrings: [
+        "如果你看到了这行字，说明我已经成功吸引到了你的注意力。",
+        "顶峰的少年，给了你所有细节，你却说我不是迪迦，给不了你想要的光。",
+        "心简单，世界就简单，幸福才会生长；心自由，生活就自由，到哪都有快乐。",
+        "生命太短，没有时间留给遗憾，若不是终点，请微笑一直向前。"
+    ],
+    musicPlayer: { server: "netease", type: "playlist", id: "2028178887" },
+    background: {
+        pc: { type: "pic", datainfo: { name: "海洋女孩", url: "https://s21.ax1x.com/2024/12/16/pALRuV0.png", pre: "https://s21.ax1x.com/2024/12/16/pALRuV0.png" } },
+        mobile: { type: "pic", datainfo: { name: "0001", url: "https://s21.ax1x.com/2024/12/16/pALRyBn.png", pre: "https://s21.ax1x.com/2024/12/16/pALRyBn.png" } }
+    },
+    wallpaper: {
+        pic: [
+            { name: "海洋女孩", url: "https://s21.ax1x.com/2024/12/16/pALRuV0.png", pre: "https://s21.ax1x.com/2024/12/16/pALRuV0.png" },
+            { name: "书房夜晚", url: "https://s21.ax1x.com/2024/12/16/pALRM8S.png", pre: "https://s21.ax1x.com/2024/12/16/pALRM8S.png" },
+            { name: "安逸舒适", url: "https://s21.ax1x.com/2024/12/16/pALRlXn.png", pre: "https://s21.ax1x.com/2024/12/16/pALRlXn.png" },
+            { name: "外链壁纸1", url: "https://s21.ax1x.com/2024/12/16/pALR3ef.jpg", pre: "https://s21.ax1x.com/2024/12/16/pALR3ef.jpg" },
+            { name: "外链壁纸2", url: "https://s21.ax1x.com/2024/12/16/pALR8X6.jpg", pre: "https://s21.ax1x.com/2024/12/16/pALR8X6.jpg" },
+            { name: "外链壁纸3", url: "https://s21.ax1x.com/2024/12/16/pALRGLQ.jpg", pre: "https://s21.ax1x.com/2024/12/16/pALRGLQ.jpg" },
+            { name: "外链壁纸4", url: "https://s21.ax1x.com/2024/12/16/pALRJpj.jpg", pre: "https://s21.ax1x.com/2024/12/16/pALRJpj.jpg" },
+            { name: "外链壁纸5", url: "https://s21.ax1x.com/2024/12/16/pALRYwT.jpg", pre: "https://s21.ax1x.com/2024/12/16/pALRYwT.jpg" },
+            { name: "外链壁纸6", url: "https://s21.ax1x.com/2024/12/16/pALRtUS.jpg", pre: "https://s21.ax1x.com/2024/12/16/pALRtUS.jpg" },
+            { name: "外链壁纸7", url: "https://s21.ax1x.com/2024/12/16/pALRal6.jpg", pre: "https://s21.ax1x.com/2024/12/16/pALRal6.jpg" },
+            { name: "外链壁纸8", url: "https://s21.ax1x.com/2024/12/16/pALR0Yj.jpg", pre: "https://s21.ax1x.com/2024/12/16/pALR0Yj.jpg" }
+        ],
+        picMobile: [
+            { name: "0001", url: "https://s21.ax1x.com/2024/12/16/pALRyBn.png", pre: "https://s21.ax1x.com/2024/12/16/pALRyBn.png" },
+            { name: "0002", url: "https://s21.ax1x.com/2024/12/16/pALR2t0.png", pre: "https://s21.ax1x.com/2024/12/16/pALR2t0.png" },
+            { name: "0003", url: "https://s21.ax1x.com/2024/12/16/pALR4AO.png", pre: "https://s21.ax1x.com/2024/12/16/pALR4AO.png" },
+            { name: "0004", url: "https://s21.ax1x.com/2024/12/16/pALRTQx.png", pre: "https://s21.ax1x.com/2024/12/16/pALRTQx.png" },
+            { name: "外链壁纸M1", url: "https://s21.ax1x.com/2024/12/16/pALRoU1.jpg", pre: "https://s21.ax1x.com/2024/12/16/pALRoU1.jpg" },
+            { name: "外链壁纸M2", url: "https://s21.ax1x.com/2024/12/16/pALR7tJ.jpg", pre: "https://s21.ax1x.com/2024/12/16/pALR7tJ.jpg" },
+            { name: "外链壁纸M3", url: "https://s21.ax1x.com/2024/12/16/pALRHZF.jpg", pre: "https://s21.ax1x.com/2024/12/16/pALRHZF.jpg" }
+        ],
+        video: [
+            { name: "尼尔：机械纪元 团队", url: "https://www.leleo.top/assets/video/Nier-Automata-Team.webm", pre: null },
+            { name: "向往航天的女孩", url: "https://www.leleo.top/assets/video/Toy-Aeroplane.webm", pre: null },
+            { name: "龙族-上杉绘梨衣", url: "https://www.leleo.top/assets/video/dragon.webm", pre: null }
+        ],
+        videoMobile: [
+            { name: "幻觉镇", url: "https://www.leleo.top/assets/video/Hallucination_town.mp4", pre: null },
+            { name: "chuva", url: "https://www.leleo.top/assets/video/chuva.mp4", pre: null },
+            { name: "小猫女仆降临", url: "https://www.leleo.top/assets/video/d12.mp4", pre: null }
+        ]
+    },
+    projectcards: [
+        { title: "Project 1", subtitle: "项目描述", text: "项目详情介绍", img: "img/sunshine.jpg", link: "https://leleo.top" },
+        { title: "Project 2", subtitle: "项目描述", text: "项目详情介绍", img: "img/sunshine.jpg", link: "https://leleo.top" },
+        { title: "Project 3", subtitle: "项目描述", text: "项目详情介绍", img: "img/sunshine.jpg", link: "https://leleo.top" },
+        { title: "Project 4", subtitle: "项目描述", text: "项目详情介绍", img: "img/sunshine.jpg", link: "https://leleo.top" },
+        { title: "Project 5", subtitle: "项目描述", text: "项目详情介绍", img: "img/sunshine.jpg", link: "https://leleo.top" },
+        { title: "Project 6", subtitle: "项目描述", text: "项目详情介绍", img: "img/sunshine.jpg", link: "https://leleo.top" },
+        { title: "Project 7", subtitle: "项目描述", text: "项目详情介绍", img: "img/sunshine.jpg", link: "https://leleo.top" },
+        { title: "Project 8", subtitle: "项目描述", text: "项目详情介绍", img: "img/sunshine.jpg", link: "https://leleo.top" }
+    ],
+    statement: {
+        icp: "XXICP备123456789号",
+        copyright: "Copyright © 2025 Leleo"
+    }
+};
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+// ========== 搜索引擎 ==========
+const searchEngines = [
+    { title: "Google", url: "https://www.google.com/search?q=" },
+    { title: "Bing", url: "https://www.bing.com/search?q=" },
+    { title: "百度", url: "https://www.baidu.com/s?wd=" },
+    { title: "GitHub", url: "https://github.com/search?q=" },
+];
+    </script>
     <script src="script.js"></script>
 </body>
 </html>
