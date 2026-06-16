@@ -14,6 +14,19 @@
     <script src="https://cdn.jsdelivr.net/npm/vuetify@3.5.17/dist/vuetify.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
+    <script>
+        // 提前检测动画开关 — 在 Vue 渲染前阻止 loading 闪烁
+        (function() {
+            if (localStorage.getItem('bwl_enable_page_animation') === '0') {
+                document.documentElement.classList.add('disable-page-animation');
+                // 隐藏 loading 元素（在 Vue 接管前用 CSS 隐藏）
+                var style = document.createElement('style');
+                style.id = 'pre-animation-off';
+                style.textContent = '.loading { display: none !important; }';
+                document.head.appendChild(style);
+            }
+        })();
+    </script>
 </head>
 <body>
     <div id="app">
