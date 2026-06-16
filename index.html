@@ -241,6 +241,13 @@
                             <label>毛玻璃模糊 ({{ blur }}px)</label>
                             <input type="range" min="0" max="30" v-model.number="blur" @input="applyTheme">
                         </div>
+                        <div class="setting-group">
+                            <label class="sync-auto-toggle">
+                                <input type="checkbox" v-model="enablePageAnimation" @change="togglePageAnimation">
+                                <span>网页打开动画</span>
+                            </label>
+                            <p class="field-hint">关闭后跳过加载动画，页面直接显示</p>
+                        </div>
                         <div class="dialog-actions">
                             <button @click="resetStyle">恢复默认</button>
                             <button @click="dialog1 = false">取消</button>

@@ -12,7 +12,7 @@
 
 /* ========== CSS 变量 ========== */
 :root {
-    --bwl-background-image-url: url('img/sunshine.jpg');
+    --bwl-background-image-url: url('img/mushroom_forest.png');
     --bwl-welcomtitle-color: #FFFFFF;
     --bwl-vcard-color: #FFFFFF;
     --bwl-brightness: 85%;
@@ -442,6 +442,19 @@ a { text-decoration: none; color: inherit; }
 
 .tab-content { animation: fadeIn 0.3s ease; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* ========== 动画开关 ========== */
+.disable-page-animation .spinner::before,
+.disable-page-animation .spinner::after {
+    animation: none !important;
+}
+.disable-page-animation .fade-in {
+    animation: none !important;
+}
+.disable-page-animation .tab-content {
+    animation: none !important;
+}
+
 .setting-group { margin-bottom: 16px; }
 .setting-group label {
     display: block; margin-bottom: 6px; color: rgba(255,255,255,0.7);

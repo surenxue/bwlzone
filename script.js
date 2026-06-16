@@ -65,6 +65,9 @@ const app = createApp({
             syncOk: true,
             autoSync: false,
 
+            // 网页打开动画
+            enablePageAnimation: true,
+
             // 技术栈图标
             stackicons: [
                 { icon: 'mdi mdi-vuejs', color: '#4FC08D', tip: 'vue' },
@@ -356,9 +359,32 @@ const app = createApp({
         },
         resetWallpaper() {
             this.selectedWallpaperIdx = -1;
+            this._resetToDefault = true;
         },
         saveWallpaper() {
-            if (this.selectedWallpaperIdx >= 0) {
+            if (this._resetToDefault) {
+                // 恢复默认：写入 config.background 中的默认壁纸
+                const defaultBg = this.configdata.background;
+                if (defaultBg) {
+                    const root = document.documentElement;
+                    const isPc = this.wallpaperDevice === 'pc';
+                    const deviceData = isPc ? defaultBg.pc : defaultBg.mobile;
+                    if (deviceData && deviceData.datainfo) {
+                        if (deviceData.type === 'pic') {
+                            root.style.setProperty('--bwl-background-image-url', `url('${deviceData.datainfo.url}')`);
+                            this.videosrc = '';
+                        } else {
+                            this.videosrc = deviceData.datainfo.url;
+                        }
+                    }
+                    const bgData = {
+                        pc: { type: defaultBg.pc?.type || 'pic', datainfo: defaultBg.pc?.datainfo || null },
+                        mobile: { type: defaultBg.mobile?.type || 'pic', datainfo: defaultBg.mobile?.datainfo || null }
+                    };
+                    localStorage.setItem('bwldatabackground', JSON.stringify(bgData));
+                }
+                this._resetToDefault = false;
+            } else if (this.selectedWallpaperIdx >= 0) {
                 const wp = this.currentWallpaperList[this.selectedWallpaperIdx];
                 if (wp) {
                     if (this.wallpaperType === 'pic') {
@@ -370,12 +396,14 @@ const app = createApp({
                     }
                 }
             }
-            // 保存到 localStorage
-            const bgData = {
-                pc: { type: this.wallpaperDevice === 'pc' ? this.wallpaperType : 'pic', datainfo: this.wallpaperDevice === 'pc' && this.selectedWallpaperIdx >= 0 ? this.currentWallpaperList[this.selectedWallpaperIdx] : null },
-                mobile: { type: this.wallpaperDevice === 'mobile' ? this.wallpaperType : 'pic', datainfo: this.wallpaperDevice === 'mobile' && this.selectedWallpaperIdx >= 0 ? this.currentWallpaperList[this.selectedWallpaperIdx] : null }
-            };
-            localStorage.setItem('bwldatabackground', JSON.stringify(bgData));
+            // 保存到 localStorage（非恢复默认时）
+            if (!this._resetToDefault) {
+                const bgData = {
+                    pc: { type: this.wallpaperDevice === 'pc' ? this.wallpaperType : 'pic', datainfo: this.wallpaperDevice === 'pc' && this.selectedWallpaperIdx >= 0 ? this.currentWallpaperList[this.selectedWallpaperIdx] : null },
+                    mobile: { type: this.wallpaperDevice === 'mobile' ? this.wallpaperType : 'pic', datainfo: this.wallpaperDevice === 'mobile' && this.selectedWallpaperIdx >= 0 ? this.currentWallpaperList[this.selectedWallpaperIdx] : null }
+                };
+                localStorage.setItem('bwldatabackground', JSON.stringify(bgData));
+            }
             this.dialog1 = false;
             this.autoSyncToServer();
         },
@@ -529,6 +557,18 @@ const app = createApp({
         },
         toggleAutoSync() {
             localStorage.setItem('bwl_auto_sync', this.autoSync ? '1' : '0');
+        },
+        togglePageAnimation() {
+            localStorage.setItem('bwl_enable_page_animation', this.enablePageAnimation ? '1' : '0');
+            this.applyAnimationState();
+        },
+        applyAnimationState() {
+            const root = document.documentElement;
+            if (this.enablePageAnimation) {
+                root.classList.remove('disable-page-animation');
+            } else {
+                root.classList.add('disable-page-animation');
+            }
         },
         getSupabaseClient() {
             if (window.supabaseClient) return window.supabaseClient;
@@ -861,6 +901,10 @@ const app = createApp({
             if (savedSyncKey) this.syncKey = savedSyncKey;
             this.autoSync = localStorage.getItem('bwl_auto_sync') === '1';
 
+            // 恢复动画开关
+            this.enablePageAnimation = localStorage.getItem('bwl_enable_page_animation') !== '0';
+            this.$nextTick(() => { this.applyAnimationState(); });
+
             // 恢复 QQ 音乐设置
             const savedQQMusic = JSON.parse(localStorage.getItem('bwl_qqmusic') || 'null');
             if (savedQQMusic) {
@@ -890,7 +934,11 @@ const app = createApp({
             }, 1000);
 
             // 显示页面
-            setTimeout(() => { this.isloading = false; }, 500);
+            if (this.enablePageAnimation) {
+                setTimeout(() => { this.isloading = false; }, 500);
+            } else {
+                this.isloading = false;
+            }
 
             // 启动打字机
             this.$nextTick(() => { this.startTypewriter(); });
