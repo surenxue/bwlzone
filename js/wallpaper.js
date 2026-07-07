@@ -159,12 +159,12 @@
   }
 
   function buildAppearanceUI() {
-    var btn = document.getElementById('rightside_config');
+    var btn = document.getElementById('ap-btn');
     if (!btn || document.getElementById('ap-panel')) return;
     var panel = document.createElement('div');
     panel.id = 'ap-panel'; panel.className = 'wp-panel ap-panel';
     panel.innerHTML =
-      '<h4>设置 · 外观</h4>' +
+      '<h4>外观设置</h4>' +
       '<div class="ap-sec">页头遮罩浓度<span class="ap-val" id="ap-maskval">35%</span></div>' +
       '<input id="ap-mask" class="ap-slider" type="range" min="0" max="100" value="35">' +
       '<div class="ap-presets"><button data-v="15">淡</button><button data-v="35">适中</button><button data-v="60">浓</button></div>' +
