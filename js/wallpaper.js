@@ -179,8 +179,10 @@
     var root = document.documentElement;
     function applyMask(v) {
       v = Math.max(0, Math.min(100, v | 0));
+      var p = document.getElementById('page-header');
+      if (p) p.classList.toggle('no-mask', v === 0);
       root.style.setProperty('--header-mask', (v / 100).toFixed(2));
-      root.style.setProperty('--header-mask-dark', Math.min(1, v / 100 + 0.2).toFixed(2));
+      root.style.setProperty('--header-mask-dark', (v / 100).toFixed(2));
       var valEl = document.getElementById('ap-maskval'); if (valEl) valEl.textContent = v + '%';
       var sl = document.getElementById('ap-mask'); if (sl) sl.value = v;
       try { localStorage.setItem('bwl_mask', String(v)); } catch (e) {}
