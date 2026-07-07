@@ -14,7 +14,7 @@
 
   function apply(url) {
     if (!bg || !url) return;
-    bg.style.setProperty('--wp', "url('" + url + "')");
+    bg.style.setProperty('background-image', "url('" + url + "')", 'important');
     try { localStorage.setItem(LS_KEY, url); } catch (e) {}
   }
   function b64(s) { return btoa(unescape(encodeURIComponent(s))); }
@@ -86,7 +86,7 @@
         selected = im.getAttribute('data-u');
         panel.querySelectorAll('.wp-thumb').forEach(function (x) { x.classList.remove('wp-active'); });
         im.classList.add('wp-active');
-        status('已选中，点「应用」生效');
+        apply(selected); status('已应用 ✓（本机已保存）', false); saveCloud(selected);
       });
     });
     document.getElementById('wp-apply').addEventListener('click', function () {
