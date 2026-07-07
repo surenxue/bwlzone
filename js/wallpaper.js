@@ -111,7 +111,53 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', buildUI);
   else buildUI();
 
-  // ---------- 外观设置面板 ----------
+  // ---------- 外观设置面板（含云端同步，复用壁纸令牌） ----------
+  function apStatus(msg, err) {
+    var el = document.getElementById('ap-status');
+    if (el) { el.textContent = msg; el.style.color = err ? '#ff9b9b' : '#7fd17f'; }
+  }
+  function saveAppearanceCloud() {
+    var token = '';
+    try { token = localStorage.getItem(TOKEN_KEY) || ''; } catch (e) {}
+    var v = 35; try { v = parseInt(localStorage.getItem('bwl_mask') || '35', 10) || 35; } catch (e) {}
+    var f = 'transparent'; try { f = localStorage.getItem('bwl_footer') || 'transparent'; } catch (e) {}
+    if (!token) { apStatus('已保存本机（未配置令牌，不同步云端）', false); return; }
+    var api = 'https://api.github.com/repos/' + REPO + '/contents/appearance.json';
+    fetch(api, { headers: { 'Authorization': 'Bearer ' + token } })
+      .then(function (r) {
+        if (r.status === 404) return { sha: null };
+        if (r.status === 401 || r.status === 403) throw new Error('令牌无效或权限不足');
+        if (!r.ok) throw new Error('读取失败 ' + r.status);
+        return r.json().then(function (x) { return { sha: x.sha }; });
+      })
+      .then(function (o) {
+        var body = { message: 'appearance: ' + v + '/' + f, content: b64(JSON.stringify({ mask: v, footer: f })) };
+        if (o.sha) body.sha = o.sha;
+        return fetch(api, { method: 'PUT', headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      })
+      .then(function (r) {
+        if (r.status === 401 || r.status === 403) { apStatus('云端同步失败：令牌无效或权限不足', true); return; }
+        if (r.ok) apStatus('已同步到云端 ✓', false);
+        else apStatus('同步失败：' + r.status, true);
+      })
+      .catch(function (e) { apStatus('云端同步失败：' + e.message, true); });
+  }
+  function loadAppearanceCloud() {
+    fetch('appearance.json?t=' + Date.now(), { cache: 'no-store' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (j) {
+        if (!j) return;
+        if (typeof j.mask === 'number') { try { localStorage.setItem('bwl_mask', String(j.mask)); } catch (e) {} }
+        if (j.footer) { try { localStorage.setItem('bwl_footer', j.footer); } catch (e) {} }
+        var sv = 35, sf = 'transparent';
+        try { sv = parseInt(localStorage.getItem('bwl_mask') || '35', 10) || 35; } catch (e) {}
+        try { sf = localStorage.getItem('bwl_footer') || 'transparent'; } catch (e) {}
+        if (window.__bwlApplyMask) window.__bwlApplyMask(sv);
+        if (window.__bwlApplyFooter) window.__bwlApplyFooter(sf);
+      })
+      .catch(function () {});
+  }
+
   function buildAppearanceUI() {
     var btn = document.getElementById('ap-btn');
     if (!btn || document.getElementById('ap-panel')) return;
@@ -124,7 +170,9 @@
       '<div class="ap-presets"><button data-v="15">淡</button><button data-v="35">适中</button><button data-v="60">浓</button></div>' +
       '<hr class="wp-hr"><div class="ap-sec">页脚底色</div>' +
       '<div class="ap-seg" id="ap-footer"><button data-m="transparent" class="ap-on">透明</button><button data-m="keep">保留蓝底</button></div>' +
-      '<hr class="wp-hr"><div class="wp-note">设置仅保存在本机浏览器，不会上传。</div>';
+      '<hr class="wp-hr"><div class="wp-note">外观偏好与壁纸共用同一个 GitHub 令牌，可跨设备同步。</div>' +
+      '<div class="wp-row"><button id="ap-sync" class="wp-btn2">同步到云端</button></div>' +
+      '<div class="wp-status" id="ap-status"></div>';
     document.body.appendChild(panel);
     btn.addEventListener('click', function () { panel.classList.toggle('wp-open'); document.querySelectorAll('.wp-open').forEach(function (o) { if (o !== panel) o.classList.remove('wp-open'); }); });
 
@@ -145,17 +193,22 @@
       });
       try { localStorage.setItem('bwl_footer', mode); } catch (e) {}
     }
+    window.__bwlApplyMask = applyMask;
+    window.__bwlApplyFooter = applyFooter;
     document.getElementById('ap-mask').addEventListener('input', function () { applyMask(parseInt(this.value, 10) || 0); });
+    document.getElementById('ap-mask').addEventListener('change', function () { applyMask(parseInt(this.value, 10) || 0); saveAppearanceCloud(); });
     panel.querySelectorAll('.ap-presets button').forEach(function (b) {
-      b.addEventListener('click', function () { applyMask(parseInt(b.getAttribute('data-v'), 10) || 0); });
+      b.addEventListener('click', function () { applyMask(parseInt(b.getAttribute('data-v'), 10) || 0); saveAppearanceCloud(); });
     });
     panel.querySelectorAll('#ap-footer button').forEach(function (b) {
-      b.addEventListener('click', function () { applyFooter(b.getAttribute('data-m')); });
+      b.addEventListener('click', function () { applyFooter(b.getAttribute('data-m')); saveAppearanceCloud(); });
     });
+    document.getElementById('ap-sync').addEventListener('click', function () { saveAppearanceCloud(); });
     var sv = 35, sf = 'transparent';
     try { sv = parseInt(localStorage.getItem('bwl_mask') || '35', 10) || 35; } catch (e) {}
     try { sf = localStorage.getItem('bwl_footer') || 'transparent'; } catch (e) {}
     applyMask(sv); applyFooter(sf);
+    loadAppearanceCloud();
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', buildAppearanceUI);
   else buildAppearanceUI();
