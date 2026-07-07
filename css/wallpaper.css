@@ -9,6 +9,9 @@
 [data-theme='dark'] #page-header:not(.not-top-img):before { background-color: rgba(0,0,0, var(--header-mask-dark, 0.55)) !important; }
 /* 遮罩浓度拉到 0 时，直接移除 :before 叠加层，确保页头完全透明 */
 #page-header.no-mask:before { display: none !important; }
+/* 页脚遮罩浓度与页头同步：拉滑块时蓝底/透明底一起变暗；0% 时移除叠加层 */
+#footer:before { background-color: rgba(0,0,0, var(--header-mask, 0.35)) !important; }
+#footer.no-mask:before { display: none !important; }
 /* 保留页脚蓝底时恢复 */
 body.keep-footer #footer { background-color: #49b1f5 !important; }
 #wp-btn i { font-size: 18px; }

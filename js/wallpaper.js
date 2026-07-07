@@ -159,12 +159,12 @@
   }
 
   function buildAppearanceUI() {
-    var btn = document.getElementById('ap-btn');
+    var btn = document.getElementById('rightside_config');
     if (!btn || document.getElementById('ap-panel')) return;
     var panel = document.createElement('div');
     panel.id = 'ap-panel'; panel.className = 'wp-panel ap-panel';
     panel.innerHTML =
-      '<h4>外观设置</h4>' +
+      '<h4>设置 · 外观</h4>' +
       '<div class="ap-sec">页头遮罩浓度<span class="ap-val" id="ap-maskval">35%</span></div>' +
       '<input id="ap-mask" class="ap-slider" type="range" min="0" max="100" value="35">' +
       '<div class="ap-presets"><button data-v="15">淡</button><button data-v="35">适中</button><button data-v="60">浓</button></div>' +
@@ -181,6 +181,8 @@
       v = Math.max(0, Math.min(100, v | 0));
       var p = document.getElementById('page-header');
       if (p) p.classList.toggle('no-mask', v === 0);
+      var f = document.getElementById('footer');
+      if (f) f.classList.toggle('no-mask', v === 0);
       root.style.setProperty('--header-mask', (v / 100).toFixed(2));
       root.style.setProperty('--header-mask-dark', (v / 100).toFixed(2));
       var valEl = document.getElementById('ap-maskval'); if (valEl) valEl.textContent = v + '%';
