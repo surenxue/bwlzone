@@ -80,7 +80,7 @@
       '<div class="wp-row"><button id="wp-sync" class="wp-btn2">同步当前壁纸到云端</button></div>' +
       '<div class="wp-status" id="wp-status"></div>';
     document.body.appendChild(panel);
-    btn.addEventListener('click', function () { panel.classList.toggle('wp-open'); });
+    btn.addEventListener('click', function () { panel.classList.toggle('wp-open'); document.querySelectorAll('.wp-open').forEach(function (o) { if (o !== panel) o.classList.remove('wp-open'); }); });
     panel.querySelectorAll('.wp-thumb').forEach(function (im) {
       im.addEventListener('click', function () {
         selected = im.getAttribute('data-u');
@@ -110,4 +110,53 @@
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', buildUI);
   else buildUI();
+
+  // ---------- 外观设置面板 ----------
+  function buildAppearanceUI() {
+    var btn = document.getElementById('ap-btn');
+    if (!btn || document.getElementById('ap-panel')) return;
+    var panel = document.createElement('div');
+    panel.id = 'ap-panel'; panel.className = 'wp-panel ap-panel';
+    panel.innerHTML =
+      '<h4>外观设置</h4>' +
+      '<div class="ap-sec">页头遮罩浓度<span class="ap-val" id="ap-maskval">35%</span></div>' +
+      '<input id="ap-mask" class="ap-slider" type="range" min="0" max="100" value="35">' +
+      '<div class="ap-presets"><button data-v="15">淡</button><button data-v="35">适中</button><button data-v="60">浓</button></div>' +
+      '<hr class="wp-hr"><div class="ap-sec">页脚底色</div>' +
+      '<div class="ap-seg" id="ap-footer"><button data-m="transparent" class="ap-on">透明</button><button data-m="keep">保留蓝底</button></div>' +
+      '<hr class="wp-hr"><div class="wp-note">设置仅保存在本机浏览器，不会上传。</div>';
+    document.body.appendChild(panel);
+    btn.addEventListener('click', function () { panel.classList.toggle('wp-open'); document.querySelectorAll('.wp-open').forEach(function (o) { if (o !== panel) o.classList.remove('wp-open'); }); });
+
+    var root = document.documentElement;
+    function applyMask(v) {
+      v = Math.max(0, Math.min(100, v | 0));
+      root.style.setProperty('--header-mask', (v / 100).toFixed(2));
+      root.style.setProperty('--header-mask-dark', Math.min(1, v / 100 + 0.2).toFixed(2));
+      var valEl = document.getElementById('ap-maskval'); if (valEl) valEl.textContent = v + '%';
+      var sl = document.getElementById('ap-mask'); if (sl) sl.value = v;
+      try { localStorage.setItem('bwl_mask', String(v)); } catch (e) {}
+    }
+    function applyFooter(mode) {
+      if (mode === 'keep') document.body.classList.add('keep-footer');
+      else document.body.classList.remove('keep-footer');
+      panel.querySelectorAll('#ap-footer button').forEach(function (b) {
+        b.classList.toggle('ap-on', b.getAttribute('data-m') === mode);
+      });
+      try { localStorage.setItem('bwl_footer', mode); } catch (e) {}
+    }
+    document.getElementById('ap-mask').addEventListener('input', function () { applyMask(parseInt(this.value, 10) || 0); });
+    panel.querySelectorAll('.ap-presets button').forEach(function (b) {
+      b.addEventListener('click', function () { applyMask(parseInt(b.getAttribute('data-v'), 10) || 0); });
+    });
+    panel.querySelectorAll('#ap-footer button').forEach(function (b) {
+      b.addEventListener('click', function () { applyFooter(b.getAttribute('data-m')); });
+    });
+    var sv = 35, sf = 'transparent';
+    try { sv = parseInt(localStorage.getItem('bwl_mask') || '35', 10) || 35; } catch (e) {}
+    try { sf = localStorage.getItem('bwl_footer') || 'transparent'; } catch (e) {}
+    applyMask(sv); applyFooter(sf);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', buildAppearanceUI);
+  else buildAppearanceUI();
 })();
