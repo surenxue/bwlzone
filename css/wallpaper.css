@@ -1,5 +1,5 @@
 /* 壁纸切换 + 云端同步 */
-#web_bg { background-attachment: fixed !important; background-image: url(/img/p1.jpg) !important; }
+#web_bg { background-attachment: fixed !important; background-image: var(--wp, url(/img/p1.jpg)) !important; }
 #web_bg:before { background-color: rgba(0,0,0,0.25) !important; }
 [data-theme='dark'] #web_bg:before { background-color: rgba(0,0,0,0.45) !important; }
 #wp-btn i { font-size: 18px; }

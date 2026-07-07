@@ -6,14 +6,15 @@
   var PRESETS = [
     '/img/p1.jpg', '/img/239.jpg', '/img/73355141_p0_master1200.jpg',
     '/img/106995872_p0.jpg', '/img/109735950_p0_master1200.jpg',
-    '/img/66965508_p0.jpg', '/img/69446164_p0.jpg', '/img/70750094_p0.jpg',
+    '/img/66965508_p0_master1200.jpg', '/img/69446164_p0_master1200.jpg', '/img/70750094_p0.jpg',
     '/img/109747615_p0_master1200.jpg', '/img/110332137_p0_master1200.jpg'
   ];
   var bg = document.getElementById('web_bg');
+  var selected = '';
 
   function apply(url) {
     if (!bg || !url) return;
-    bg.style.backgroundImage = "url('" + url + "')";
+    bg.style.setProperty('--wp', "url('" + url + "')");
     try { localStorage.setItem(LS_KEY, url); } catch (e) {}
   }
   function b64(s) { return btoa(unescape(encodeURIComponent(s))); }
@@ -77,19 +78,20 @@
     btn.addEventListener('click', function () { panel.classList.toggle('wp-open'); });
     panel.querySelectorAll('.wp-thumb').forEach(function (im) {
       im.addEventListener('click', function () {
-        var u = im.getAttribute('data-u');
-        apply(u);
+        selected = im.getAttribute('data-u');
         panel.querySelectorAll('.wp-thumb').forEach(function (x) { x.classList.remove('wp-active'); });
         im.classList.add('wp-active');
-        status('已应用，正在同步…');
-        saveCloud(u);
+        status('已选中，点「应用」生效');
       });
     });
     document.getElementById('wp-apply').addEventListener('click', function () {
-      var u = document.getElementById('wp-custom').value.trim();
-      if (!u) return;
+      var u = document.getElementById('wp-custom').value.trim() || selected;
+      if (!u) { status('请先选一张壁纸或填写 URL', true); return; }
       apply(u); status('已应用，正在同步…'); saveCloud(u);
     });
+    try { var sv = localStorage.getItem(LS_KEY) || ''; if (sv) {
+      panel.querySelectorAll('.wp-thumb').forEach(function (im) { if (im.getAttribute('data-u') === sv) im.classList.add('wp-active'); });
+    } } catch (e) {}
     document.getElementById('wp-savetoken').addEventListener('click', function () {
       var t = document.getElementById('wp-token').value.trim();
       try { localStorage.setItem(TOKEN_KEY, t); } catch (e) {}
