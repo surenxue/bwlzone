@@ -41,3 +41,17 @@ body.keep-footer #footer { background-color: #49b1f5 !important; }
   border-radius: 6px; padding: 6px 8px; cursor: pointer; font-size: 12px; }
 .ap-presets button:hover, .ap-seg button:hover { background: rgba(255,255,255,.16); }
 .ap-seg button.ap-on { background: #4da3ff; color: #fff; border-color: #4da3ff; }
+/* 把原生「设置」隐藏组改造成左侧弹出的设置面板：外观设置 + 单栏双栏等统一入口 */
+.wp-hr { margin: 12px 0; border: 0; border-top: 1px solid rgba(255,255,255,.12); }
+#rightside #rightside-config-hide {
+  position: fixed !important; right: 70px !important; bottom: 112px !important; z-index: 9999 !important;
+  width: 284px !important; max-height: 72vh !important; overflow-y: auto !important;
+  background: rgba(20,20,22,0.92) !important; color: #eee !important; border-radius: 12px !important;
+  box-shadow: 0 8px 30px rgba(0,0,0,.45) !important; padding: 14px 16px !important;
+  border: 1px solid rgba(255,255,255,.08) !important; backdrop-filter: blur(8px) !important;
+  height: auto !important; opacity: 0 !important; transform: none !important;
+  transition: opacity .2s !important; display: none !important;
+}
+#rightside #rightside-config-hide.show { display: block !important; opacity: 1 !important; }
+.set-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 8px 0; font-size: 13px; }
+.set-row span { color: #cdd; }
