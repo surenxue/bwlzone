@@ -2,6 +2,10 @@
 #web_bg { background-attachment: fixed !important; background-image: url(/img/p1.jpg) !important; }
 #web_bg:before { background-color: rgba(0,0,0,0.25) !important; }
 [data-theme='dark'] #web_bg:before { background-color: rgba(0,0,0,0.45) !important; }
+/* 让页头/页脚透明，露出壁纸（去掉原本浮在背景上的那张默认图） */
+#page-header, #footer { background-color: transparent !important; background-image: none !important; }
+#page-header:not(.not-top-img):before { background-color: rgba(0,0,0,0.35) !important; }
+[data-theme='dark'] #page-header:not(.not-top-img):before { background-color: rgba(0,0,0,0.55) !important; }
 #wp-btn i { font-size: 18px; }
 .wp-panel { position: fixed; right: 22px; bottom: 112px; z-index: 9999; width: 284px; max-height: 72vh; overflow-y: auto;
   background: rgba(20,20,22,0.92); color: #eee; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,.45);
