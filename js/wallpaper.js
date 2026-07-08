@@ -84,7 +84,7 @@
     panel.addEventListener('click', function (e) { e.stopPropagation(); });
     document.addEventListener('click', function (e) {
       var t = e.target;
-      if (t && t.closest && (t.closest('#rightside') || t.closest('.wp-panel') || t.closest('#rightside-config-hide'))) return;
+      if (t && t.closest && (t.closest('.wp-panel') || t.closest('#rightside-config-hide') || t.closest('#rightside-config-show'))) return;
       document.querySelectorAll('.wp-panel.wp-open').forEach(function (o) { o.classList.remove('wp-open'); });
       var h = document.getElementById('rightside-config-hide'); if (h) h.classList.remove('show');
     });
