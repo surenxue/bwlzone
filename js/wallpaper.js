@@ -68,7 +68,8 @@
     var panel = document.createElement('div');
     panel.id = 'wp-panel'; panel.className = 'wp-panel';
     var grid = PRESETS.map(function (u) {
-      return '<img class="wp-thumb" src="' + u + '" data-u="' + u + '" alt="">';
+      var nm = u.split('/').pop();
+      return '<img class="wp-thumb" loading="lazy" decoding="async" src="/img/thumb/' + nm + '" data-u="' + u + '" alt="' + nm + '">';
     }).join('');
     panel.innerHTML =
       '<h4>切换壁纸</h4>' +
