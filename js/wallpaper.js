@@ -80,7 +80,14 @@
       '<div class="wp-row"><button id="wp-sync" class="wp-btn2">同步当前壁纸到云端</button></div>' +
       '<div class="wp-status" id="wp-status"></div>';
     document.body.appendChild(panel);
-    btn.addEventListener('click', function () { panel.classList.toggle('wp-open'); document.querySelectorAll('.wp-open').forEach(function (o) { if (o !== panel) o.classList.remove('wp-open'); }); var h = document.getElementById('rightside-config-hide'); if (h) h.classList.remove('show'); });
+    btn.addEventListener('click', function (e) { e.stopPropagation(); panel.classList.toggle('wp-open'); document.querySelectorAll('.wp-open').forEach(function (o) { if (o !== panel) o.classList.remove('wp-open'); }); var h = document.getElementById('rightside-config-hide'); if (h) h.classList.remove('show'); });
+    panel.addEventListener('click', function (e) { e.stopPropagation(); });
+    document.addEventListener('click', function (e) {
+      var t = e.target;
+      if (t && t.closest && (t.closest('#rightside') || t.closest('.wp-panel') || t.closest('#rightside-config-hide'))) return;
+      document.querySelectorAll('.wp-panel.wp-open').forEach(function (o) { o.classList.remove('wp-open'); });
+      var h = document.getElementById('rightside-config-hide'); if (h) h.classList.remove('show');
+    });
     panel.querySelectorAll('.wp-thumb').forEach(function (im) {
       im.addEventListener('click', function () {
         selected = im.getAttribute('data-u');
@@ -131,7 +138,8 @@
         return r.json().then(function (x) { return { sha: x.sha }; });
       })
       .then(function (o) {
-        var body = { message: 'appearance: ' + v + '/' + f, content: b64(JSON.stringify({ mask: v, footer: f })) };
+        var bgc = ''; try { bgc = localStorage.getItem('bwl_panel_bg') || ''; } catch (e) {}
+        var body = { message: 'appearance: ' + v + '/' + f + '/' + bgc, content: b64(JSON.stringify({ mask: v, footer: f, panelBg: bgc })) };
         if (o.sha) body.sha = o.sha;
         return fetch(api, { method: 'PUT', headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
       })
@@ -154,6 +162,7 @@
         try { sf = localStorage.getItem('bwl_footer') || 'transparent'; } catch (e) {}
         if (window.__bwlApplyMask) window.__bwlApplyMask(sv);
         if (window.__bwlApplyFooter) window.__bwlApplyFooter(sf);
+        if (j.panelBg) { if (window.__bwlApplyBg) window.__bwlApplyBg(j.panelBg); else document.documentElement.style.setProperty('--panel-bg', j.panelBg); }
       })
       .catch(function () {});
   }
@@ -170,6 +179,8 @@
       '<div class="ap-presets"><button data-v="15">淡</button><button data-v="35">适中</button><button data-v="60">浓</button></div>' +
       '<hr class="wp-hr"><div class="ap-sec">页脚底色</div>' +
       '<div class="ap-seg" id="ap-footer"><button data-m="transparent" class="ap-on">透明</button><button data-m="keep">保留蓝底</button></div>' +
+      '<hr class="wp-hr"><div class="ap-sec">弹窗背景色</div>' +
+      '<input id="ap-bg" type="color" value="#141416" class="ap-color">' +
       '<hr class="wp-hr"><div class="wp-note">外观偏好与壁纸共用同一个 GitHub 令牌，可跨设备同步。</div>' +
       '<div class="wp-row"><button id="ap-sync" class="wp-btn2">同步到云端</button></div>' +
       '<div class="wp-status" id="ap-status"></div>';
@@ -198,6 +209,15 @@
     }
     window.__bwlApplyMask = applyMask;
     window.__bwlApplyFooter = applyFooter;
+    var bgInput = document.getElementById('ap-bg');
+    function applyBg(c) { root.style.setProperty('--panel-bg', c); if (bgInput) bgInput.value = c; }
+    window.__bwlApplyBg = applyBg;
+    var savedBg = ''; try { savedBg = localStorage.getItem('bwl_panel_bg') || ''; } catch (e) {}
+    if (savedBg) applyBg(savedBg);
+    if (bgInput) {
+      bgInput.addEventListener('input', function () { applyBg(this.value); });
+      bgInput.addEventListener('change', function () { applyBg(this.value); try { localStorage.setItem('bwl_panel_bg', this.value); } catch (e) {} saveAppearanceCloud(); });
+    }
     document.getElementById('ap-mask').addEventListener('input', function () { applyMask(parseInt(this.value, 10) || 0); });
     document.getElementById('ap-mask').addEventListener('change', function () { applyMask(parseInt(this.value, 10) || 0); saveAppearanceCloud(); });
     ap.querySelectorAll('.ap-presets button').forEach(function (b) {

@@ -2,6 +2,7 @@
 #web_bg { background-attachment: fixed !important; background-image: url(/img/p1.jpg) !important; }
 #web_bg:before { background-color: rgba(0,0,0,0.25) !important; }
 [data-theme='dark'] #web_bg:before { background-color: rgba(0,0,0,0.45) !important; }
+:root { --panel-bg: #141416; }
 /* 让页头/页脚透明，露出壁纸（去掉原本浮在背景上的那张默认图） */
 #page-header, #footer { background-color: transparent !important; background-image: none !important; }
 /* 页头遮罩浓度可用变量调节（设置面板里拖动滑块即时生效） */
@@ -15,9 +16,9 @@
 /* 保留页脚蓝底时恢复 */
 body.keep-footer #footer { background-color: #49b1f5 !important; }
 #wp-btn i { font-size: 18px; }
-.wp-panel, .ap-panel { position: fixed; right: 22px; bottom: 112px; z-index: 9999; width: 284px; max-height: 72vh; overflow-y: auto;
-  background: rgba(20,20,22,0.92); color: #eee; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,.45);
-  padding: 14px 16px; font-size: 13px; line-height: 1.6; display: none; backdrop-filter: blur(8px);
+.wp-panel, .ap-panel { position: fixed; right: 70px; bottom: 112px; z-index: 9999; width: 284px; max-height: 72vh; overflow-y: auto;
+  background: var(--panel-bg); color: #eee; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,.45);
+  padding: 14px 16px; font-size: 13px; line-height: 1.6; display: none;
   border: 1px solid rgba(255,255,255,.08); }
 .wp-panel.wp-open { display: block; }
 .wp-panel h4 { margin: 0 0 10px; font-size: 14px; color: #fff; }
@@ -41,14 +42,15 @@ body.keep-footer #footer { background-color: #49b1f5 !important; }
   border-radius: 6px; padding: 6px 8px; cursor: pointer; font-size: 12px; }
 .ap-presets button:hover, .ap-seg button:hover { background: rgba(255,255,255,.16); }
 .ap-seg button.ap-on { background: #4da3ff; color: #fff; border-color: #4da3ff; }
+.ap-color { width: 100%; height: 34px; border: 0; border-radius: 6px; cursor: pointer; background: transparent; padding: 0; margin: 6px 0; }
 /* 把原生「设置」隐藏组改造成左侧弹出的设置面板：外观设置 + 单栏双栏等统一入口 */
 .wp-hr { margin: 12px 0; border: 0; border-top: 1px solid rgba(255,255,255,.12); }
 #rightside #rightside-config-hide {
   position: fixed !important; right: 70px !important; bottom: 112px !important; z-index: 9999 !important;
   width: 284px !important; max-height: 72vh !important; overflow-y: auto !important;
-  background: rgba(20,20,22,0.92) !important; color: #eee !important; border-radius: 12px !important;
+  background: var(--panel-bg) !important; color: #eee !important; border-radius: 12px !important;
   box-shadow: 0 8px 30px rgba(0,0,0,.45) !important; padding: 14px 16px !important;
-  border: 1px solid rgba(255,255,255,.08) !important; backdrop-filter: blur(8px) !important;
+  border: 1px solid rgba(255,255,255,.08) !important;
   height: auto !important; opacity: 0 !important; transform: none !important;
   transition: opacity .2s !important; display: none !important;
 }
