@@ -58,13 +58,15 @@
   }
 
   function buildUI() {
-    if (document.getElementById('wp-btn')) return;
     var show = document.querySelector('#rightside-config-show');
     if (!show) return;
-    var btn = document.createElement('button');
-    btn.id = 'wp-btn'; btn.type = 'button'; btn.title = '切换壁纸（云端同步）';
-    btn.innerHTML = '<i class="fas fa-image"></i>';
-    show.appendChild(btn);
+    var btn = document.getElementById('wp-btn');
+    if (!btn) {
+      btn = document.createElement('button');
+      btn.id = 'wp-btn'; btn.type = 'button'; btn.title = '切换壁纸（云端同步）';
+      btn.innerHTML = '<i class="fas fa-image"></i>';
+      show.appendChild(btn);
+    }
     var panel = document.createElement('div');
     panel.id = 'wp-panel'; panel.className = 'wp-panel';
     var grid = PRESETS.map(function (u) {
