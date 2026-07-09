@@ -21,6 +21,7 @@ body.keep-footer #footer { background-color: #49b1f5 !important; }
   padding: 14px 16px; font-size: 13px; line-height: 1.6; display: none;
   border: 1px solid rgba(255,255,255,.08); }
 .wp-panel.wp-open { display: block; }
+  .ap-panel.ap-open { display: block; }
 .wp-panel h4 { margin: 0 0 10px; font-size: 14px; color: #fff; }
 .wp-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px; }
 .wp-thumb { width: 100%; height: 42px; object-fit: cover; border-radius: 6px; cursor: pointer; border: 2px solid transparent; }
@@ -46,10 +47,6 @@ body.keep-footer #footer { background-color: #49b1f5 !important; }
 .ap-swatch { width: 26px; height: 26px; border-radius: 6px; cursor: pointer; border: 2px solid transparent; box-shadow: 0 0 0 1px rgba(255,255,255,.15) inset; }
 .ap-swatch:hover { transform: scale(1.08); }
 .ap-swatch.ap-on { border-color: #4da3ff; box-shadow: 0 0 0 2px #4da3ff; }
-.ap-picker { display: flex; flex-direction: column; gap: 6px; margin: 8px 0; }
-.ap-picker label { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #cdd; }
-.ap-picker label input { flex: 1; accent-color: #4da3ff; }
-.ap-prev { display: inline-block; width: 100%; height: 22px; border-radius: 5px; margin-top: 2px; box-shadow: 0 0 0 1px rgba(255,255,255,.15) inset; }
 /* 把原生「设置」隐藏组改造成左侧弹出的设置面板：外观设置 + 单栏双栏等统一入口 */
 .wp-hr { margin: 12px 0; border: 0; border-top: 1px solid rgba(255,255,255,.12); }
 #rightside #rightside-config-hide {

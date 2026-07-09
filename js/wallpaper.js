@@ -86,10 +86,11 @@
     btn.addEventListener('click', function (e) { e.stopPropagation(); panel.classList.toggle('wp-open'); document.querySelectorAll('.wp-open').forEach(function (o) { if (o !== panel) o.classList.remove('wp-open'); }); var h = document.getElementById('rightside-config-hide'); if (h) h.classList.remove('show'); });
     panel.addEventListener('click', function (e) { e.stopPropagation(); });
     document.addEventListener('click', function (e) {
-      var t = e.target;
-      if (t && t.closest && (t.closest('.wp-panel') || t.closest('#rightside-config-hide') || t.closest('#rightside-config-show'))) return;
-      document.querySelectorAll('.wp-panel.wp-open').forEach(function (o) { o.classList.remove('wp-open'); });
-      var h = document.getElementById('rightside-config-hide'); if (h) h.classList.remove('show');
+    var t = e.target;
+    if (t && t.closest && (t.closest('.wp-panel') || t.closest('.ap-panel') || t.closest('#rightside-config-hide') || t.closest('#rightside-config-show'))) return;
+    document.querySelectorAll('.wp-panel.wp-open').forEach(function (o) { o.classList.remove('wp-open'); });
+    var ap = document.getElementById('ap-panel'); if (ap) ap.classList.remove('ap-open');
+    var h = document.getElementById('rightside-config-hide'); if (h) h.classList.remove('show');
     });
     panel.querySelectorAll('.wp-thumb').forEach(function (im) {
       im.addEventListener('click', function () {
@@ -172,7 +173,8 @@
 
   function buildAppearanceUI() {
     var ap = document.getElementById('ap-body');
-    var gear = document.getElementById('rightside_config');
+    var apBtn = document.getElementById('ap-btn');
+    var apPanel = document.getElementById('ap-panel');
     if (!ap || ap.dataset.built) return;
     ap.dataset.built = '1';
     ap.innerHTML =
@@ -182,28 +184,33 @@
       '<div class="ap-presets"><button data-v="15">淡</button><button data-v="35">适中</button><button data-v="60">浓</button></div>' +
       '<hr class="wp-hr"><div class="ap-sec">页脚底色</div>' +
       '<div class="ap-seg" id="ap-footer"><button data-m="transparent" class="ap-on">透明</button><button data-m="keep">保留蓝底</button></div>' +
-      '<hr class="wp-hr"><div class="ap-sec">弹窗背景色</div>' +
+      '<hr class="wp-hr"><div class="ap-sec">弹窗背景色（常见几种）</div>' +
       '<div class="ap-swatches">' +
-        '<span class="ap-swatch" data-c="#141416" style="background:#141416"></span>' +
-        '<span class="ap-swatch" data-c="#1e1e24" style="background:#1e1e24"></span>' +
-        '<span class="ap-swatch" data-c="#0f1419" style="background:#0f1419"></span>' +
-        '<span class="ap-swatch" data-c="#2b2b2b" style="background:#2b2b2b"></span>' +
-        '<span class="ap-swatch" data-c="#3a2d22" style="background:#3a2d22"></span>' +
-        '<span class="ap-swatch" data-c="#1f2d3a" style="background:#1f2d3a"></span>' +
-        '<span class="ap-swatch" data-c="#f5f5f5" style="background:#f5f5f5"></span>' +
-        '<span class="ap-swatch" data-c="#ffffff" style="background:#ffffff"></span>' +
-      '</div>' +
-      '<div class="wp-row"><button id="ap-bg-custom" class="wp-btn2">自定义颜色</button><button id="ap-bg-reset" class="wp-btn2">重置</button></div>' +
-      '<div id="ap-bg-picker" class="ap-picker" style="display:none">' +
-        '<label>R<input id="ap-r" type="range" min="0" max="255" value="20"></label>' +
-        '<label>G<input id="ap-g" type="range" min="0" max="255" value="20"></label>' +
-        '<label>B<input id="ap-b" type="range" min="0" max="255" value="22"></label>' +
-        '<span id="ap-bg-prev" class="ap-prev"></span>' +
+        '<span class="ap-swatch" data-c="#141416" style="background:#141416" title="深灰"></span>' +
+        '<span class="ap-swatch" data-c="#1e1e24" style="background:#1e1e24" title="暗夜"></span>' +
+        '<span class="ap-swatch" data-c="#0f1419" style="background:#0f1419" title="墨黑"></span>' +
+        '<span class="ap-swatch" data-c="#1f2d3a" style="background:#1f2d3a" title="深蓝"></span>' +
+        '<span class="ap-swatch" data-c="#3a2d22" style="background:#3a2d22" title="暖棕"></span>' +
+        '<span class="ap-swatch" data-c="#26322a" style="background:#26322a" title="墨绿"></span>' +
+        '<span class="ap-swatch" data-c="#2d2440" style="background:#2d2440" title="暗紫"></span>' +
+        '<span class="ap-swatch" data-c="#f5f5f5" style="background:#f5f5f5" title="浅灰"></span>' +
+        '<span class="ap-swatch" data-c="#ffffff" style="background:#ffffff" title="纯白"></span>' +
       '</div>' +
       '<hr class="wp-hr"><div class="wp-note">外观偏好与壁纸共用同一个 GitHub 令牌，可跨设备同步。</div>' +
       '<div class="wp-row"><button id="ap-sync" class="wp-btn2">同步到云端</button></div>' +
       '<div class="wp-status" id="ap-status"></div>';
-    if (gear) gear.addEventListener('click', function () { document.querySelectorAll('.wp-open').forEach(function (o) { o.classList.remove('wp-open'); }); });
+
+    if (apBtn && apPanel) {
+      apBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var open = apPanel.classList.toggle('ap-open');
+        document.querySelectorAll('.wp-open').forEach(function (o) { o.classList.remove('wp-open'); });
+        if (open) { var h = document.getElementById('rightside-config-hide'); if (h) h.classList.remove('show'); }
+      });
+      apPanel.addEventListener('click', function (e) { e.stopPropagation(); });
+    }
+    var gear = document.getElementById('rightside_config');
+    if (gear) gear.addEventListener('click', function () { if (apPanel) apPanel.classList.remove('ap-open'); });
 
     var root = document.documentElement;
     function applyMask(v) {
@@ -231,34 +238,17 @@
     function applyBg(c) {
       c = c || '#141416';
       root.style.setProperty('--panel-bg', c);
-      var prev = document.getElementById('ap-bg-prev'); if (prev) prev.style.background = c;
       ap.querySelectorAll('.ap-swatch').forEach(function (s) {
         s.classList.toggle('ap-on', (s.getAttribute('data-c') || '').toLowerCase() === String(c).toLowerCase());
       });
     }
     window.__bwlApplyBg = applyBg;
     function persistBg(c) { try { localStorage.setItem('bwl_panel_bg', c); } catch (e) {} }
-    function syncSlidersFrom(c) {
-      var m = /rgba?\((\d+),\s*(\d+),\s*(\d+)/i.exec(c);
-      var rr = document.getElementById('ap-r'), gg = document.getElementById('ap-g'), bb = document.getElementById('ap-b');
-      if (m) { if (rr) rr.value = m[1]; if (gg) gg.value = m[2]; if (bb) bb.value = m[3]; }
-      else { var h = String(c).replace('#', ''); if (h.length === 6) { if (rr) rr.value = parseInt(h.substr(0, 2), 16); if (gg) gg.value = parseInt(h.substr(2, 2), 16); if (bb) bb.value = parseInt(h.substr(4, 2), 16); } }
-    }
-    function rgbFromSliders() { var rr = document.getElementById('ap-r'), gg = document.getElementById('ap-g'), bb = document.getElementById('ap-b'); if (!rr || !gg || !bb) return null; return 'rgb(' + rr.value + ',' + gg.value + ',' + bb.value + ')'; }
     var savedBg = ''; try { savedBg = localStorage.getItem('bwl_panel_bg') || ''; } catch (e) {}
-    if (savedBg) { applyBg(savedBg); syncSlidersFrom(savedBg); } else { applyBg('#141416'); syncSlidersFrom('#141416'); }
+    if (savedBg) applyBg(savedBg); else applyBg('#141416');
     ap.querySelectorAll('.ap-swatch').forEach(function (s) {
       s.addEventListener('click', function () { var c = s.getAttribute('data-c'); applyBg(c); persistBg(c); saveAppearanceCloud(); });
     });
-    var customBtn = document.getElementById('ap-bg-custom'), picker = document.getElementById('ap-bg-picker');
-    if (customBtn && picker) customBtn.addEventListener('click', function () { picker.style.display = picker.style.display === 'none' ? 'flex' : 'none'; });
-    [document.getElementById('ap-r'), document.getElementById('ap-g'), document.getElementById('ap-b')].forEach(function (sl) {
-      if (!sl) return;
-      sl.addEventListener('input', function () { var c = rgbFromSliders(); applyBg(c); persistBg(c); });
-      sl.addEventListener('change', function () { var c = rgbFromSliders(); applyBg(c); persistBg(c); saveAppearanceCloud(); });
-    });
-    var resetBtn = document.getElementById('ap-bg-reset');
-    if (resetBtn) resetBtn.addEventListener('click', function () { applyBg('#141416'); persistBg('#141416'); syncSlidersFrom('#141416'); saveAppearanceCloud(); });
     document.getElementById('ap-mask').addEventListener('input', function () { applyMask(parseInt(this.value, 10) || 0); });
     document.getElementById('ap-mask').addEventListener('change', function () { applyMask(parseInt(this.value, 10) || 0); saveAppearanceCloud(); });
     ap.querySelectorAll('.ap-presets button').forEach(function (b) {
