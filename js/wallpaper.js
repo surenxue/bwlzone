@@ -58,20 +58,17 @@
   }
 
   function buildUI() {
+    if (document.getElementById('wp-btn')) return;
     var show = document.querySelector('#rightside-config-show');
     if (!show) return;
-    var btn = document.getElementById('wp-btn');
-    if (!btn) {
-      btn = document.createElement('button');
-      btn.id = 'wp-btn'; btn.type = 'button'; btn.title = '切换壁纸（云端同步）';
-      btn.innerHTML = '<i class="fas fa-image"></i>';
-      show.appendChild(btn);
-    }
+    var btn = document.createElement('button');
+    btn.id = 'wp-btn'; btn.type = 'button'; btn.title = '切换壁纸（云端同步）';
+    btn.innerHTML = '<i class="fas fa-image"></i>';
+    show.appendChild(btn);
     var panel = document.createElement('div');
     panel.id = 'wp-panel'; panel.className = 'wp-panel';
     var grid = PRESETS.map(function (u) {
-      var nm = u.split('/').pop();
-      return '<img class="wp-thumb" loading="lazy" decoding="async" src="/img/thumb/' + nm + '" data-u="' + u + '" alt="' + nm + '">';
+      return '<img class="wp-thumb" src="' + u + '" data-u="' + u + '" alt="">';
     }).join('');
     panel.innerHTML =
       '<h4>切换壁纸</h4>' +
@@ -83,15 +80,7 @@
       '<div class="wp-row"><button id="wp-sync" class="wp-btn2">同步当前壁纸到云端</button></div>' +
       '<div class="wp-status" id="wp-status"></div>';
     document.body.appendChild(panel);
-    btn.addEventListener('click', function (e) { e.stopPropagation(); panel.classList.toggle('wp-open'); document.querySelectorAll('.wp-open').forEach(function (o) { if (o !== panel) o.classList.remove('wp-open'); }); var h = document.getElementById('rightside-config-hide'); if (h) h.classList.remove('show'); });
-    panel.addEventListener('click', function (e) { e.stopPropagation(); });
-    document.addEventListener('click', function (e) {
-    var t = e.target;
-    if (t && t.closest && (t.closest('.wp-panel') || t.closest('.ap-panel') || t.closest('#rightside-config-hide') || t.closest('#rightside-config-show'))) return;
-    document.querySelectorAll('.wp-panel.wp-open').forEach(function (o) { o.classList.remove('wp-open'); });
-    var ap = document.getElementById('ap-panel'); if (ap) ap.classList.remove('ap-open');
-    var h = document.getElementById('rightside-config-hide'); if (h) h.classList.remove('show');
-    });
+    btn.addEventListener('click', function () { panel.classList.toggle('wp-open'); document.querySelectorAll('.wp-open').forEach(function (o) { if (o !== panel) o.classList.remove('wp-open'); }); });
     panel.querySelectorAll('.wp-thumb').forEach(function (im) {
       im.addEventListener('click', function () {
         selected = im.getAttribute('data-u');
@@ -142,8 +131,7 @@
         return r.json().then(function (x) { return { sha: x.sha }; });
       })
       .then(function (o) {
-        var bgc = ''; try { bgc = localStorage.getItem('bwl_panel_bg') || ''; } catch (e) {}
-        var body = { message: 'appearance: ' + v + '/' + f + '/' + bgc, content: b64(JSON.stringify({ mask: v, footer: f, panelBg: bgc })) };
+        var body = { message: 'appearance: ' + v + '/' + f, content: b64(JSON.stringify({ mask: v, footer: f })) };
         if (o.sha) body.sha = o.sha;
         return fetch(api, { method: 'PUT', headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
       })
@@ -166,51 +154,27 @@
         try { sf = localStorage.getItem('bwl_footer') || 'transparent'; } catch (e) {}
         if (window.__bwlApplyMask) window.__bwlApplyMask(sv);
         if (window.__bwlApplyFooter) window.__bwlApplyFooter(sf);
-        if (j.panelBg) { if (window.__bwlApplyBg) window.__bwlApplyBg(j.panelBg); else document.documentElement.style.setProperty('--panel-bg', j.panelBg); }
       })
       .catch(function () {});
   }
 
   function buildAppearanceUI() {
-    var ap = document.getElementById('ap-body');
-    var apBtn = document.getElementById('ap-btn');
-    var apPanel = document.getElementById('ap-panel');
-    if (!ap || ap.dataset.built) return;
-    ap.dataset.built = '1';
-    ap.innerHTML =
+    var btn = document.getElementById('ap-btn');
+    if (!btn || document.getElementById('ap-panel')) return;
+    var panel = document.createElement('div');
+    panel.id = 'ap-panel'; panel.className = 'wp-panel ap-panel';
+    panel.innerHTML =
       '<h4>外观设置</h4>' +
       '<div class="ap-sec">页头遮罩浓度<span class="ap-val" id="ap-maskval">35%</span></div>' +
       '<input id="ap-mask" class="ap-slider" type="range" min="0" max="100" value="35">' +
       '<div class="ap-presets"><button data-v="15">淡</button><button data-v="35">适中</button><button data-v="60">浓</button></div>' +
       '<hr class="wp-hr"><div class="ap-sec">页脚底色</div>' +
       '<div class="ap-seg" id="ap-footer"><button data-m="transparent" class="ap-on">透明</button><button data-m="keep">保留蓝底</button></div>' +
-      '<hr class="wp-hr"><div class="ap-sec">弹窗背景色（常见几种）</div>' +
-      '<div class="ap-swatches">' +
-        '<span class="ap-swatch" data-c="#141416" style="background:#141416" title="深灰"></span>' +
-        '<span class="ap-swatch" data-c="#1e1e24" style="background:#1e1e24" title="暗夜"></span>' +
-        '<span class="ap-swatch" data-c="#0f1419" style="background:#0f1419" title="墨黑"></span>' +
-        '<span class="ap-swatch" data-c="#1f2d3a" style="background:#1f2d3a" title="深蓝"></span>' +
-        '<span class="ap-swatch" data-c="#3a2d22" style="background:#3a2d22" title="暖棕"></span>' +
-        '<span class="ap-swatch" data-c="#26322a" style="background:#26322a" title="墨绿"></span>' +
-        '<span class="ap-swatch" data-c="#2d2440" style="background:#2d2440" title="暗紫"></span>' +
-        '<span class="ap-swatch" data-c="#f5f5f5" style="background:#f5f5f5" title="浅灰"></span>' +
-        '<span class="ap-swatch" data-c="#ffffff" style="background:#ffffff" title="纯白"></span>' +
-      '</div>' +
       '<hr class="wp-hr"><div class="wp-note">外观偏好与壁纸共用同一个 GitHub 令牌，可跨设备同步。</div>' +
       '<div class="wp-row"><button id="ap-sync" class="wp-btn2">同步到云端</button></div>' +
       '<div class="wp-status" id="ap-status"></div>';
-
-    if (apBtn && apPanel) {
-      apBtn.addEventListener('click', function (e) {
-        e.stopPropagation();
-        var open = apPanel.classList.toggle('ap-open');
-        document.querySelectorAll('.wp-open').forEach(function (o) { o.classList.remove('wp-open'); });
-        if (open) { var h = document.getElementById('rightside-config-hide'); if (h) h.classList.remove('show'); }
-      });
-      apPanel.addEventListener('click', function (e) { e.stopPropagation(); });
-    }
-    var gear = document.getElementById('rightside_config');
-    if (gear) gear.addEventListener('click', function () { if (apPanel) apPanel.classList.remove('ap-open'); });
+    document.body.appendChild(panel);
+    btn.addEventListener('click', function () { panel.classList.toggle('wp-open'); document.querySelectorAll('.wp-open').forEach(function (o) { if (o !== panel) o.classList.remove('wp-open'); }); });
 
     var root = document.documentElement;
     function applyMask(v) {
@@ -228,33 +192,19 @@
     function applyFooter(mode) {
       if (mode === 'keep') document.body.classList.add('keep-footer');
       else document.body.classList.remove('keep-footer');
-      ap.querySelectorAll('#ap-footer button').forEach(function (b) {
+      panel.querySelectorAll('#ap-footer button').forEach(function (b) {
         b.classList.toggle('ap-on', b.getAttribute('data-m') === mode);
       });
       try { localStorage.setItem('bwl_footer', mode); } catch (e) {}
     }
     window.__bwlApplyMask = applyMask;
     window.__bwlApplyFooter = applyFooter;
-    function applyBg(c) {
-      c = c || '#141416';
-      root.style.setProperty('--panel-bg', c);
-      ap.querySelectorAll('.ap-swatch').forEach(function (s) {
-        s.classList.toggle('ap-on', (s.getAttribute('data-c') || '').toLowerCase() === String(c).toLowerCase());
-      });
-    }
-    window.__bwlApplyBg = applyBg;
-    function persistBg(c) { try { localStorage.setItem('bwl_panel_bg', c); } catch (e) {} }
-    var savedBg = ''; try { savedBg = localStorage.getItem('bwl_panel_bg') || ''; } catch (e) {}
-    if (savedBg) applyBg(savedBg); else applyBg('#141416');
-    ap.querySelectorAll('.ap-swatch').forEach(function (s) {
-      s.addEventListener('click', function () { var c = s.getAttribute('data-c'); applyBg(c); persistBg(c); saveAppearanceCloud(); });
-    });
     document.getElementById('ap-mask').addEventListener('input', function () { applyMask(parseInt(this.value, 10) || 0); });
     document.getElementById('ap-mask').addEventListener('change', function () { applyMask(parseInt(this.value, 10) || 0); saveAppearanceCloud(); });
-    ap.querySelectorAll('.ap-presets button').forEach(function (b) {
+    panel.querySelectorAll('.ap-presets button').forEach(function (b) {
       b.addEventListener('click', function () { applyMask(parseInt(b.getAttribute('data-v'), 10) || 0); saveAppearanceCloud(); });
     });
-    ap.querySelectorAll('#ap-footer button').forEach(function (b) {
+    panel.querySelectorAll('#ap-footer button').forEach(function (b) {
       b.addEventListener('click', function () { applyFooter(b.getAttribute('data-m')); saveAppearanceCloud(); });
     });
     document.getElementById('ap-sync').addEventListener('click', function () { saveAppearanceCloud(); });
