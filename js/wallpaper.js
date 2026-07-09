@@ -80,7 +80,7 @@
       '<div class="wp-row"><button id="wp-sync" class="wp-btn2">同步当前壁纸到云端</button></div>' +
       '<div class="wp-status" id="wp-status"></div>';
     document.body.appendChild(panel);
-    btn.addEventListener('click', function (e) { e.stopPropagation(); panel.classList.add('wp-open'); document.querySelectorAll('.wp-open').forEach(function (o) { if (o !== panel) o.classList.remove('wp-open'); }); });
+    btn.addEventListener('click', function (e) { e.stopPropagation(); panel.classList.toggle('wp-open'); document.querySelectorAll('.wp-open').forEach(function (o) { if (o !== panel) o.classList.remove('wp-open'); }); });
     panel.querySelectorAll('.wp-thumb').forEach(function (im) {
       im.addEventListener('click', function () {
         selected = im.getAttribute('data-u');
@@ -174,7 +174,7 @@
       '<div class="wp-row"><button id="ap-sync" class="wp-btn2">同步到云端</button></div>' +
       '<div class="wp-status" id="ap-status"></div>';
     document.body.appendChild(panel);
-    btn.addEventListener('click', function (e) { e.stopPropagation(); panel.classList.add('wp-open'); document.querySelectorAll('.wp-open').forEach(function (o) { if (o !== panel) o.classList.remove('wp-open'); }); });
+    btn.addEventListener('click', function (e) { e.stopPropagation(); panel.classList.toggle('wp-open'); document.querySelectorAll('.wp-open').forEach(function (o) { if (o !== panel) o.classList.remove('wp-open'); }); });
 
     var root = document.documentElement;
     function applyMask(v) {
