@@ -54,5 +54,28 @@
     "imageAlt": "原站博客重构文章的封面插画",
     "body": "<h2 id=\"why\">一、为什么重构</h2>\n<p>原来的站点是一个单页 Vue 应用，虽然功能多（设置面板、云端同步、音乐、壁纸），\n但对我来说维护成本高、内容也不像「博客」。</p>\n<h2 id=\"how\">二、怎么做</h2>\n<p>我直接复用了 Butterfly 主题的 <code>css/</code>、<code>js/</code> 与图片资源，\n用一份 Python 小脚本生成各页面（首页、文章、归档、分类、标签、关于、友链），\n保持零构建——改完推到 GitHub Pages 即可上线。</p>\n<h2 id=\"next\">三、接下来</h2>\n<p>把这里的占位文章替换成真实笔记，并持续更新。</p>",
     "source_sha": "49dc6291c09995dc27f5284d00ba50515c6e90c1"
+  },
+  {
+    "slug": "2026/10/25/bwlzone-v1-0-gpt-build",
+    "title": "BWL的角落 V1.0：一次与 GPT 协作的建站记录",
+    "date": "2026-10-25",
+    "categories": [
+      "技术",
+      "前端"
+    ],
+    "tags": [
+      "GPT协作",
+      "个人网站",
+      "版本记录"
+    ],
+    "description": "从读取旧站、生成页面、验证交互，到同步 GitHub Pages 与正式域名，记录 BWL的角落 V1.0 的完整创建过程。",
+    "image": "/assets/v1-0-star-trails.jpg",
+    "imageAlt": "蓝色星轨天空与日照雪山，BWL 提供的 V1.0 笔记封面",
+    "imagePosition": "center 67%",
+    "imageWidth": 3300,
+    "imageHeight": 2080,
+    "showCover": true,
+    "version": "V1.0",
+    "body": "<p>2026 年 10 月 25 日，我把「BWL的角落」的这次改版正式定为 <strong>V1.0</strong>。这篇笔记记录我与 GPT 编码助手从整理旧站到发布新版的实际协作过程，也给后续的每次修改留下一个清楚的起点。</p>\n<p>需求、域名、仓库和这张星轨雪山图片由我提供；GPT 负责整理需求、编写页面与脚本、执行检查，并在我要求同步后把新版推送到 GitHub。本文根据本次对话和实际执行结果整理。</p>\n<h2 id=\"starting-point\">一、从已有网站和仓库开始</h2>\n<p>这次的起点是 <a href=\"https://www.bwlzone.fun/\" target=\"_blank\" rel=\"noopener noreferrer\">www.bwlzone.fun</a> 和 <a href=\"https://github.com/surenxue/bwlzone\" target=\"_blank\" rel=\"noopener noreferrer\">surenxue/bwlzone</a> 仓库。旧站已经有首页、归档、分类、标签、关于、友链，以及三篇文章。</p>\n<p>GPT 先通过 GitHub 连接读取仓库目录、首页、<code>CNAME</code> 和文章页面，确认站点名是「BWL的角落」，内容围绕嵌入式、前端与生活记录。仓库当时保存的是 Hexo Butterfly 风格的静态页面；此次新版采用 Node.js 脚本生成 HTML。</p>\n<p>三篇旧文的正文、日期、分类、标签和原有文章路径都被保留下来。原有图片和资源目录也继续保留，避免已有链接因改版失效。</p>\n<h2 id=\"requirements\">二、把需求整理成可以落地的版本</h2>\n<p>最初我询问已有域名是否需要提供，随后补充了网站和仓库地址。GPT 据此以原站为基础，先制作一版可查看的新版博客，再根据我的指令同步到原仓库和原域名。</p>\n<ul>\n<li><strong>保留内容：</strong>导入原来的三篇笔记，继续使用熟悉的个人站点名称和素材。</li>\n<li><strong>整理界面：</strong>重新设计首页、文章卡片、阅读页、归档与分类页面。</li>\n<li><strong>补足交互：</strong>加入全文搜索、分类筛选、深浅色切换、移动端菜单和返回顶部。</li>\n<li><strong>便于维护：</strong>把文章数据、样式、交互与生成脚本整理到明确的文件中。</li>\n</ul>\n<h2 id=\"design\">三、GPT 如何生成新版页面</h2>\n<p>页面采用浅色纸面与绿色点缀，使用「记录折腾，也记录生活」作为首页主标题。右侧保留原站的蘑菇森林插画；下方用一篇重点笔记和紧凑文章列表承接阅读，再配上作者简介、主题分类和 GitHub 入口。</p>\n<p>GPT 编写公共 HTML 生成函数，使导航、页脚、搜索窗口和文章元信息能在不同页面复用。样式集中在 <code>src/style.css</code>，浏览器交互集中在 <code>src/app.js</code>。文章读取自 <code>content.json</code>，由 <code>scripts/build.mjs</code> 生成页面。</p>\n<p>这些功能由页面代码完成：搜索读取文章索引并匹配标题、标签和正文；分类按钮筛选首页卡片；主题选择保存到当前浏览器；文章目录使用标题锚点跳转；代码块提供复制按钮。网站运行期间没有接入 GPT 聊天或自动写作服务。</p>\n<h2 id=\"preview\">四、先完成 Sites 私人预览</h2>\n<p>第一版通过 Sites 创建并发布为仅所有者可访问的站点，用来查看整体效果。GPT 在本地保存源码、生成静态文件、检查页面，再通过 Sites 的源码与发布流程完成预览版本。</p>\n<p>这一阶段已有 23 个页面，包含三篇原文、归档、四个分类、九个标签，以及关于、友链和 404 页面。我的原域名在这个阶段仍使用原来的 GitHub Pages 站点。</p>\n<h2 id=\"testing\">五、发布前怎样检查</h2>\n<p>GPT 对生成的 HTML 进行检查，确认页面内部链接和图片路径存在，原文正文没有被改写，分类与标签都有对应页面。第一次完整版本通过了 443 个本地链接与资源引用检查。</p>\n<p>浏览器检查覆盖桌面 1440 像素宽度，以及 390 和 320 像素的手机布局；同时检查图片加载、搜索结果与无结果状态、分类筛选、主题保存、移动端菜单、文章目录和代码区显示。截图用于确认实际版式，浏览器控制台也检查了脚本错误。</p>\n<p>本次增加 V1.0 笔记后，文章数量、归档、搜索、分类和标签会重新生成，并再次检查新图片、版本标识与长文章在手机上的显示。</p>\n<h2 id=\"github\">六、同步到原来的 GitHub 和域名</h2>\n<p>我提出「同步上去，在自己的网址看」后，GPT 检查了原站的发布记录，确认使用现有的 GitHub Pages 发布流程。GitHub 连接已经具备仓库写入权限，因此实际同步通过连接器完成，没有使用此前提供的 Linux 私钥路径。</p>\n<p>同步时保留 <code>CNAME</code> 中的 <code>www.bwlzone.fun</code>，把新版生成文件放到仓库根目录，并加入 <code>.nojekyll</code>。页面的 canonical、Open Graph 地址和 sitemap 统一使用正式域名。</p>\n<p>提交以原来分支的最新提交为父提交，更新 <code>main</code> 时校验预期分支头，使用正常向前更新。旧资源继续保留，域名解析沿用既有设置。</p>\n<p>首次同步提交为 <a href=\"https://github.com/surenxue/bwlzone/commit/23cbd1683d14dd2cd5695a4d5a288f5f30da3eed\" target=\"_blank\" rel=\"noopener noreferrer\"><code>23cbd168</code></a>，对应的 <a href=\"https://github.com/surenxue/bwlzone/actions/runs/40189501892\" target=\"_blank\" rel=\"noopener noreferrer\">GitHub Pages 发布任务</a> 已成功。随后实际访问正式域名，验证新版首页、样式、搜索索引、ESP32 文章和中文分类页均能正常返回。</p>\n<h2 id=\"version\">七、把这次改版定为 V1.0</h2>\n<p>V1.0 是这次个人博客改版的正式版本标记。软件版本使用 <code>1.0.0</code>，页脚显示 <code>V1.0</code>，仓库中的 <code>VERSION</code> 文件和站点配置保留同样的版本信息。</p>\n<p>这篇是基于三篇旧文新增的第四篇笔记。封面和正文图片采用我提供的蓝色星轨与雪山照片，图片作为独立素材保存。首页卡片调整了显示焦点，正文保留完整画面；页面分享图片也使用这张封面。</p>\n<p>当前网页背景仍是纯色。这里记录的是新增笔记和版本整理，在线上传、切换整站壁纸的设置尚未加入本版。</p>\n<h2 id=\"maintenance\">八、以后如何继续修改</h2>\n<p>更新文章时修改 <code>content.json</code>；更换图片时把新文件放到 <code>assets/</code>，并更新文章的 <code>image</code>、<code>imageAlt</code> 和显示位置。调整页面样式或交互时分别修改 <code>src/style.css</code>、<code>src/app.js</code>；公共页面结构由生成脚本维护。</p>\n<figure class=\"highlight\"><pre><code>npm run build\nnpm run dev</code></pre></figure>\n<p>构建命令会生成页面、执行内容和内部链接检查，并把发布文件整理到仓库根目录。预览确认后提交并推送到 <code>main</code>，等待 GitHub Pages 发布成功，再访问正式网址核对效果。</p>\n<h2 id=\"takeaways\">九、留下一个可以继续生长的起点</h2>\n<p>这次协作让我把需求、页面、内容、检查和发布连成了一个实际可执行的流程。GPT 帮助完成代码和重复操作，我通过提供真实资料、提出修改方向和查看上线结果来决定网站的样子。</p>\n<p>V1.0 先把这个角落搭稳。之后每次增加功能或整理内容，都可以沿着这份记录继续前进。</p>"
   }
 ]
