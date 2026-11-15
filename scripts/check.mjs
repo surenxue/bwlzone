@@ -44,5 +44,14 @@ for(const post of content) {
   for(const c of post.categories) assert.ok(files.includes(path.join(root,'categories',c,'index.html')),`Category route: ${c}`);
   for(const t of post.tags) assert.ok(files.includes(path.join(root,'tags',t,'index.html')),`Tag route: ${t}`);
 }
+const ideas=JSON.parse(await readFile('ideas.json','utf8'));
+const categoriesPage=await readFile(path.join(root,'categories','index.html'),'utf8');
+assert.ok(categoriesPage.includes('href="/ideas/"') && categoriesPage.includes('05 /'),'Fifth category card');
+const ideasPage=await readFile(path.join(root,'ideas','index.html'),'utf8');
+for(const topic of ['programming','hardware']) {
+  assert.ok(ideasPage.includes(`href="/ideas/${topic}/"`),`Idea topic link: ${topic}`);
+  assert.ok(files.includes(path.join(root,'ideas',topic,'index.html')),`Idea topic route: ${topic}`);
+}
+for(const idea of ideas) assert.ok(files.includes(path.join(root,'ideas',idea.slug,'index.html')),`Idea detail route: ${idea.slug}`);
 assert.ok(!files.some(f=>f.endsWith('.md')),'Markdown records are not in the generated website');
-console.log(`PASS: ${pages.length} pages, ${checkedLinks} local links/assets, ${content.length} articles (${content.filter(p=>p.source_sha).length} original bodies), version ${config.versionLabel}, all category/tag routes.`);
+console.log(`PASS: ${pages.length} pages, ${checkedLinks} local links/assets, ${content.length} articles (${content.filter(p=>p.source_sha).length} original bodies), ${ideas.length} idea records, version ${config.versionLabel}, all category/tag routes.`);

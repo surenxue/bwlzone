@@ -3,6 +3,21 @@ import path from 'node:path';
 await mkdir('dist/assets', { recursive: true });
 await cp('assets', 'dist/assets', { recursive: true });
 const posts = JSON.parse(await readFile('content.json', 'utf8')).sort((a, b) => b.date.localeCompare(a.date));
+const ideasSource = JSON.parse(await readFile('ideas.json', 'utf8'));
+if (!Array.isArray(ideasSource)) throw new Error('ideas.json must contain an array.');
+const ideaTopics = [
+  { slug: 'programming', name: '程序设计', description: '代码、逻辑与实现过程中遇到的问题和冒出的想法。', symbol: 'code' },
+  { slug: 'hardware', name: '硬件设计', description: '电路、器件与调试过程中值得记下的发现。', symbol: 'chip' },
+];
+const ideaNames = new Set(ideaTopics.map(topic => topic.name));
+const ideaSlugs = new Set();
+for (const item of ideasSource) {
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(item.slug) || ideaTopics.some(topic => topic.slug === item.slug) || ideaSlugs.has(item.slug)) throw new Error(`Invalid or duplicate idea slug: ${item.slug}`);
+  if (!ideaNames.has(item.category) || !['问题', '灵感'].includes(item.kind)) throw new Error(`Invalid idea category or kind: ${item.slug}`);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(item.date) || !['title', 'summary', 'body'].every(key => typeof item[key] === 'string' && item[key].trim())) throw new Error(`Incomplete idea: ${item.slug}`);
+  ideaSlugs.add(item.slug);
+}
+const ideas = ideasSource.sort((a, b) => b.date.localeCompare(a.date));
 const config = JSON.parse(await readFile('site.config.json', 'utf8'));
 const origin = config.origin;
 const versionLabel = config.versionLabel || 'V1.0';
@@ -17,6 +32,8 @@ const icons = {
   close: '<path d="m6 6 12 12M6 18 18 6"/>',
   code: '<path d="m8 7-5 5 5 5m8-10 5 5-5 5m-3-13-2 16"/>',
   leaf: '<path d="M20 4C9 2 2 9 6 16s17 1 14-12ZM5 20l10-11"/>',
+  lightbulb: '<path d="M9 18h6m-5 3h4M8.5 15c0-1-.4-1.7-1.2-2.4A7 7 0 1 1 16.7 12.6c-.8.7-1.2 1.4-1.2 2.4v1H8.5Z"/>',
+  chip: '<rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 9h6v6H9zM9 2v4m6-4v4M9 18v4m6-4v4M2 9h4m-4 6h4m12-6h4m-4 6h4"/>',
   github: '<path d="M9 19c-4 1.2-4-2-5-2.5m10 4.5v-3.2a2.8 2.8 0 0 0-.8-2.2c2.7-.3 5.5-1.3 5.5-6A4.7 4.7 0 0 0 17.5 6c.1-.4.5-1.7-.1-3.3 0 0-1-.3-3.4 1.2a11.3 11.3 0 0 0-6 0C5.6 2.4 4.6 2.7 4.6 2.7 4 4.3 4.4 5.6 4.5 6a4.7 4.7 0 0 0-1.2 3.3c0 4.7 2.8 5.7 5.5 6a2.8 2.8 0 0 0-.8 2.2V21"/>',
   email: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/>',
   qq: '<path d="M8 9c0-3 1.5-5 4-5s4 2 4 5l1 4-2 4H9l-2-4 1-4Z"/><path d="M8 11 5 15m11-4 3 4M9 17l-2 3m8-3 2 3"/><circle cx="10.5" cy="9" r=".8" fill="currentColor" stroke="none"/><circle cx="13.5" cy="9" r=".8" fill="currentColor" stroke="none"/>',
@@ -62,11 +79,30 @@ const pages = new Map([['index.html', layout({title:'BWL的角落', active:'home
 
 function intro(label, title, description) { return `<div class="page-intro"><span class="eyebrow">${label}</span><h1>${title}</h1><p>${description}</p></div>`; }
 function archiveList(list) { return `<div class="archive-list">${list.map(p => `<a class="archive-item" href="${url(p)}"><time datetime="${p.date}">${date(p.date)}</time><div><span class="archive-category">${esc(p.categories.at(-1))}</span><h2>${esc(p.title)}</h2><p>${esc(p.description)}</p></div>${icon('arrow')}</a>`).join('')}</div>`; }
+const ideaUrl = item => `/ideas/${item.slug}/`;
+const ideaCount = name => ideas.filter(item => item.category === name).length;
+function ideaList(list, emptyTitle) {
+  if (!list.length) return `<div class="idea-empty"><span class="eyebrow">A SPACE FOR THE NEXT THOUGHT</span><h2>${esc(emptyTitle)}</h2><p>遇到问题或想到新点子时，第一条记录就会出现在这里。</p></div>`;
+  return `<div class="idea-list">${list.map(item => `<a class="idea-entry" href="${ideaUrl(item)}"><span class="idea-kind">${esc(item.kind)} / ${esc(item.category)}</span><time datetime="${item.date}">${date(item.date)}</time><h2>${esc(item.title)}</h2><p>${esc(item.summary)}</p>${icon('arrow')}</a>`).join('')}</div>`;
+}
+function ideaTabs(active) {
+  return `<nav class="idea-tabs" aria-label="问题与灵感分类">${[['/ideas/','全部','all',ideas.length],...ideaTopics.map(topic=>[`/ideas/${topic.slug}/`,topic.name,topic.slug,ideaCount(topic.name)])].map(([href,label,key,count])=>`<a href="${href}" ${active===key?'aria-current="page"':''}>${label}<span>${count}</span></a>`).join('')}</nav>`;
+}
 pages.set('archives/index.html', layout({title:'归档',pathname:'/archives/',active:'archives',body:`<div class="page-shell">${intro('EVERY NOTE COUNTS','时间留下的笔记','一些探索，一些记录。把走过的路，留在这里。')}<div class="archive-year"><h2>2026<span>${posts.length} 篇记录</span></h2>${archiveList(posts)}</div></div>`}));
-pages.set('categories/index.html', layout({title:'分类',pathname:'/categories/',active:'categories',body:`<div class="page-shell">${intro('FOLLOW YOUR CURIOSITY','从兴趣出发','按主题找找看，也许有你正在折腾的东西。')}<div class="category-grid">${categories.map((c,i) => `<a class="category-tile" href="/categories/${encodeURIComponent(c)}/"><span class="category-index">0${i+1} /</span>${icon(i===0?'leaf':'code')}<h2>${esc(c)}</h2><span>${countCategory(c)} 篇笔记</span>${icon('arrow')}</a>`).join('')}</div><div class="tags-block"><h2>也可以沿着标签，继续探索</h2><div class="tag-cloud">${tags.map(t=>`<a href="/tags/${encodeURIComponent(t)}/"># ${esc(t)}</a>`).join('')}</div></div></div>`}));
+pages.set('categories/index.html', layout({title:'分类',pathname:'/categories/',active:'categories',body:`<div class="page-shell">${intro('FOLLOW YOUR CURIOSITY','从兴趣出发','按主题找找看，也许有你正在折腾的东西。')}<div class="category-grid">${categories.map((c,i) => `<a class="category-tile" href="/categories/${encodeURIComponent(c)}/"><span class="category-index">0${i+1} /</span>${icon(i===0?'leaf':'code')}<h2>${esc(c)}</h2><span>${countCategory(c)} 篇笔记</span>${icon('arrow')}</a>`).join('')}<a class="category-tile category-tile-ideas" href="/ideas/"><span class="category-index">05 /</span>${icon('lightbulb')}<h2>问题与灵感</h2><span>${ideas.length} 条记录</span>${icon('arrow')}</a></div><div class="tags-block"><h2>也可以沿着标签，继续探索</h2><div class="tag-cloud">${tags.map(t=>`<a href="/tags/${encodeURIComponent(t)}/"># ${esc(t)}</a>`).join('')}</div></div></div>`}));
 for (const c of categories) {
   const pathname = '/categories/' + encodeURIComponent(c) + '/';
   pages.set(`categories/${c}/index.html`,layout({title:c,pathname,active:'categories',body:`<div class="page-shell"><a class="breadcrumb" href="/categories/">← 全部分类</a>${intro('NOTES IN THIS TOPIC',esc(c),`${countCategory(c)} 篇关于${esc(c)}的笔记。`)}${archiveList(posts.filter(p=>p.categories.includes(c)))}</div>`}));
+}
+pages.set('ideas/index.html',layout({title:'问题与灵感',pathname:'/ideas/',active:'categories',body:`<div class="page-shell ideas-page"><a class="breadcrumb" href="/categories/">← 全部分类</a>${intro('QUESTIONS & IDEAS','问题与灵感','把遇到的问题与突然冒出的想法，按方向慢慢记下来。')}<div class="idea-topics">${ideaTopics.map((topic,i)=>`<a class="idea-topic" href="/ideas/${topic.slug}/"><span class="category-index">0${i+1} / ${esc(topic.name)}</span>${icon(topic.symbol)}<h2>${esc(topic.name)}</h2><p>${esc(topic.description)}</p><span class="idea-topic-count">${ideaCount(topic.name)} 条记录</span>${icon('arrow')}</a>`).join('')}</div><section class="idea-feed"><div class="idea-feed-heading"><h2>最近记录</h2><span>${ideas.length} 条</span></div>${ideaList(ideas,'新的问题与灵感，从这里开始。')}</section></div>`}));
+for (const topic of ideaTopics) {
+  const entries=ideas.filter(item=>item.category===topic.name);
+  pages.set(`ideas/${topic.slug}/index.html`,layout({title:topic.name+' · 问题与灵感',pathname:`/ideas/${topic.slug}/`,active:'categories',body:`<div class="page-shell ideas-page"><a class="breadcrumb" href="/ideas/">← 问题与灵感</a>${intro('QUESTIONS & IDEAS',esc(topic.name),esc(topic.description))}${ideaTabs(topic.slug)}${ideaList(entries,topic.name+'的第一条记录，还在路上。')}</div>`}));
+}
+for (const item of ideas) {
+  const topic=ideaTopics.find(entry=>entry.name===item.category);
+  const paragraphs=item.body.trim().split(/\n\s*\n/).map(line=>`<p>${esc(line).replaceAll('\n','<br>')}</p>`).join('');
+  pages.set(`ideas/${item.slug}/index.html`,layout({title:item.title,description:item.summary,pathname:ideaUrl(item),active:'categories',body:`<article class="page-shell idea-detail"><a class="breadcrumb" href="/ideas/${topic.slug}/">← ${esc(topic.name)}</a><header class="idea-detail-header"><span class="idea-kind">${esc(item.kind)} / ${esc(item.category)}</span><h1>${esc(item.title)}</h1><time datetime="${item.date}">${date(item.date)}</time><p>${esc(item.summary)}</p></header><div class="prose idea-detail-body">${paragraphs}</div><a class="text-link" href="/ideas/">返回问题与灵感 ${icon('arrow')}</a></article>`}));
 }
 pages.set('tags/index.html',layout({title:'标签',pathname:'/tags/',active:'categories',body:`<div class="page-shell">${intro('CONNECTED BY IDEAS','笔记的线索','用标签串起每一次探索。')}<div class="tag-cloud large">${tags.map(t=>`<a href="/tags/${encodeURIComponent(t)}/"># ${esc(t)} <span>${posts.filter(p=>p.tags.includes(t)).length}</span></a>`).join('')}</div></div>`}));
 for (const tag of tags) {
@@ -90,4 +126,4 @@ await copyFile('src/style.css','dist/style.css');
 await copyFile('src/app.js','dist/app.js');
 await writeFile('dist/robots.txt',`User-agent: *\nAllow: /\nSitemap: ${origin}/sitemap.xml\n`);
 await writeFile('dist/sitemap.xml',`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${[...pages.keys()].filter(p=>p!=='404.html').map(p=>`<url><loc>${origin}/${p.replace(/index\.html$/,'')}</loc></url>`).join('')}</urlset>`);
-console.log(`Built ${pages.size} pages, ${posts.length} articles, ${categories.length} categories and ${tags.length} tags.`);
+console.log(`Built ${pages.size} pages, ${posts.length} articles, ${categories.length} article categories, ${ideaTopics.length} idea topics and ${tags.length} tags.`);
