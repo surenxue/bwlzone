@@ -8,6 +8,8 @@ if (!Array.isArray(ideasSource)) throw new Error('ideas.json must contain an arr
 const ideaTopics = [
   { slug: 'programming', name: '程序设计', description: '代码、逻辑与实现过程中遇到的问题和冒出的想法。', symbol: 'code' },
   { slug: 'hardware', name: '硬件设计', description: '电路、器件与调试过程中值得记下的发现。', symbol: 'chip' },
+  { slug: 'life', name: '生活思路', description: '日常生活里的问题、选择和值得留下的小发现。', symbol: 'leaf' },
+  { slug: 'development', name: '发展思路', description: '学习方向、成长计划与长期目标中的思考。', symbol: 'lightbulb' },
 ];
 const ideaNames = new Set(ideaTopics.map(topic => topic.name));
 const ideaSlugs = new Set();

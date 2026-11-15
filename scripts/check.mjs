@@ -48,7 +48,7 @@ const ideas=JSON.parse(await readFile('ideas.json','utf8'));
 const categoriesPage=await readFile(path.join(root,'categories','index.html'),'utf8');
 assert.ok(categoriesPage.includes('href="/ideas/"') && categoriesPage.includes('05 /'),'Fifth category card');
 const ideasPage=await readFile(path.join(root,'ideas','index.html'),'utf8');
-for(const topic of ['programming','hardware']) {
+for(const topic of ['programming','hardware','life','development']) {
   assert.ok(ideasPage.includes(`href="/ideas/${topic}/"`),`Idea topic link: ${topic}`);
   assert.ok(files.includes(path.join(root,'ideas',topic,'index.html')),`Idea topic route: ${topic}`);
 }
