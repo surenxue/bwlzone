@@ -84,9 +84,9 @@ function archiveList(list) { return `<div class="archive-list">${list.map(p => `
 const ideaUrl = item => `/ideas/${item.slug}/`;
 const ideaCount = name => ideas.filter(item => item.category === name).length;
 const ideaNumber = item => ideas.filter(entry => entry.category === item.category).findIndex(entry => entry.slug === item.slug) + 1;
-function ideaList(list, emptyTitle) {
+function ideaList(list, emptyTitle, numbered = false) {
   if (!list.length) return `<div class="idea-empty"><span class="eyebrow">A SPACE FOR THE NEXT THOUGHT</span><h2>${esc(emptyTitle)}</h2><p>遇到问题或想到新点子时，第一条记录就会出现在这里。</p></div>`;
-  return `<div class="idea-list">${list.map(item => `<a class="idea-entry" href="${ideaUrl(item)}"><span class="idea-kind">${esc(item.kind)} / ${esc(item.category)}</span><time datetime="${item.date}">${date(item.date)}</time><h2>${ideaNumber(item)}. ${esc(item.title)}</h2><p>${esc(item.summary)}</p>${icon('arrow')}</a>`).join('')}</div>`;
+  return `<div class="idea-list">${list.map(item => `<a class="idea-entry" href="${ideaUrl(item)}"><span class="idea-kind">${esc(item.kind)} / ${esc(item.category)}</span><time datetime="${item.date}">${date(item.date)}</time><h2>${numbered ? `${ideaNumber(item)}. ` : ''}${esc(item.title)}</h2><p>${esc(item.summary)}</p>${icon('arrow')}</a>`).join('')}</div>`;
 }
 function ideaTabs(active) {
   return `<nav class="idea-tabs" aria-label="问题与灵感分类">${[['/ideas/','全部','all',ideas.length],...ideaTopics.map(topic=>[`/ideas/${topic.slug}/`,topic.name,topic.slug,ideaCount(topic.name)])].map(([href,label,key,count])=>`<a href="${href}" ${active===key?'aria-current="page"':''}>${label}<span>${count}</span></a>`).join('')}</nav>`;
@@ -100,7 +100,7 @@ for (const c of categories) {
 pages.set('ideas/index.html',layout({title:'问题与灵感',pathname:'/ideas/',active:'categories',body:`<div class="page-shell ideas-page"><a class="breadcrumb" href="/categories/">← 全部分类</a>${intro('QUESTIONS & IDEAS','问题与灵感','把遇到的问题与突然冒出的想法，按方向慢慢记下来。')}<div class="idea-topics">${ideaTopics.map((topic,i)=>`<a class="idea-topic" href="/ideas/${topic.slug}/"><span class="category-index">0${i+1} / ${esc(topic.name)}</span><div class="idea-topic-top"><span class="idea-topic-icon">${icon(topic.symbol)}</span><span class="idea-topic-count">${ideaCount(topic.name)} 条记录 ${icon('arrow')}</span></div><h2>${esc(topic.name)}</h2><p>${esc(topic.description)}</p></a>`).join('')}</div><section class="idea-feed"><div class="idea-feed-heading"><h2>最近记录</h2><span>${ideas.length} 条</span></div>${ideaList(ideas,'新的问题与灵感，从这里开始。')}</section></div>`}));
 for (const topic of ideaTopics) {
   const entries=ideas.filter(item=>item.category===topic.name);
-  pages.set(`ideas/${topic.slug}/index.html`,layout({title:topic.name+' · 问题与灵感',pathname:`/ideas/${topic.slug}/`,active:'categories',body:`<div class="page-shell ideas-page"><a class="breadcrumb" href="/ideas/">← 问题与灵感</a>${intro('QUESTIONS & IDEAS',esc(topic.name),esc(topic.description))}${ideaTabs(topic.slug)}${ideaList(entries,topic.name+'的第一条记录，还在路上。')}</div>`}));
+  pages.set(`ideas/${topic.slug}/index.html`,layout({title:topic.name+' · 问题与灵感',pathname:`/ideas/${topic.slug}/`,active:'categories',body:`<div class="page-shell ideas-page"><a class="breadcrumb" href="/ideas/">← 问题与灵感</a>${intro('QUESTIONS & IDEAS',esc(topic.name),esc(topic.description))}${ideaTabs(topic.slug)}${ideaList(entries,topic.name+'的第一条记录，还在路上。',true)}</div>`}));
 }
 for (const item of ideas) {
   const topic=ideaTopics.find(entry=>entry.name===item.category);
