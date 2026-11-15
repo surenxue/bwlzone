@@ -83,9 +83,10 @@ function intro(label, title, description) { return `<div class="page-intro"><spa
 function archiveList(list) { return `<div class="archive-list">${list.map(p => `<a class="archive-item" href="${url(p)}"><time datetime="${p.date}">${date(p.date)}</time><div><span class="archive-category">${esc(p.categories.at(-1))}</span><h2>${esc(p.title)}</h2><p>${esc(p.description)}</p></div>${icon('arrow')}</a>`).join('')}</div>`; }
 const ideaUrl = item => `/ideas/${item.slug}/`;
 const ideaCount = name => ideas.filter(item => item.category === name).length;
+const ideaNumber = item => ideas.filter(entry => entry.category === item.category).findIndex(entry => entry.slug === item.slug) + 1;
 function ideaList(list, emptyTitle) {
   if (!list.length) return `<div class="idea-empty"><span class="eyebrow">A SPACE FOR THE NEXT THOUGHT</span><h2>${esc(emptyTitle)}</h2><p>遇到问题或想到新点子时，第一条记录就会出现在这里。</p></div>`;
-  return `<div class="idea-list">${list.map(item => `<a class="idea-entry" href="${ideaUrl(item)}"><span class="idea-kind">${esc(item.kind)} / ${esc(item.category)}</span><time datetime="${item.date}">${date(item.date)}</time><h2>${esc(item.title)}</h2><p>${esc(item.summary)}</p>${icon('arrow')}</a>`).join('')}</div>`;
+  return `<div class="idea-list">${list.map(item => `<a class="idea-entry" href="${ideaUrl(item)}"><span class="idea-kind">${esc(item.kind)} / ${esc(item.category)}</span><time datetime="${item.date}">${date(item.date)}</time><h2>${ideaNumber(item)}. ${esc(item.title)}</h2><p>${esc(item.summary)}</p>${icon('arrow')}</a>`).join('')}</div>`;
 }
 function ideaTabs(active) {
   return `<nav class="idea-tabs" aria-label="问题与灵感分类">${[['/ideas/','全部','all',ideas.length],...ideaTopics.map(topic=>[`/ideas/${topic.slug}/`,topic.name,topic.slug,ideaCount(topic.name)])].map(([href,label,key,count])=>`<a href="${href}" ${active===key?'aria-current="page"':''}>${label}<span>${count}</span></a>`).join('')}</nav>`;
